@@ -33,7 +33,14 @@ if uploaded_files:
             st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}")
             
             df = string['data']
-            st.dataframe(df)
+            summary_data = {
+                "Shot Number": df['shot_number'].values,
+                "Score": df['score'].values,
+                "Time": df['time'].values
+            }
+            summary_df = pd.DataFrame(summary_data)
+            summary_df.loc['Total'] = summary_df.sum(numeric_only=True)
+            st.table(summary_df)
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
             st.pyplot(fig)
