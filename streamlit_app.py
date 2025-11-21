@@ -47,11 +47,35 @@ if uploaded_files:
             except Exception:
                 summary_df_t.columns = [f"Shot {i+1}" for i in range(len(df))]
             # add a Total column (sums for each row)
-            summary_df_t['Total'] = [
-                '',
-                df['score'].sum(),
-                ''
-            ]
+            # convert scores for summing (treat 'x' or 'X' as 10) and prepare display values
+            def _to_int_score(s):
+                if pd.isna(s):
+                    return 0
+                if isinstance(s, str) and s.strip().lower() == 'x':
+                    return 10
+                try:
+                    return int(float(s))
+                except Exception:
+                    return 0
+
+            numeric_scores = df['score'].apply(_to_int_score)
+
+            def _display_score(s):
+                if pd.isna(s):
+                    return ''
+                if isinstance(s, str) and s.strip().lower() == 'x':
+                    return 'X'
+                try:
+                    return str(int(float(s)))
+                except Exception:
+                    return str(s)
+
+            # update Score row to display 'X' for x values
+            if 'Score' in summary_df_t.index:
+                summary_df_t.loc['Score'] = [_display_score(v) for v in df['score'].values]
+
+            # add a Total column (sum of integer-converted scores, with blanks for non-score rows)
+            summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
             st.table(summary_df_t)
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
