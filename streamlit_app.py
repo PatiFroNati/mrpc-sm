@@ -17,11 +17,10 @@ uploaded_files = st.file_uploader(
     "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv"]
 )   
 
-def parse_shotmarker_csv(filepath):
+def parse_shotmarker_csv(uploaded_file):
     """Parse the ShotMarker CSV file with multiple shooting strings."""
     
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
+    lines = uploaded_file.read().decode('utf-8').split('\n')
     
     all_strings = []
     current_string = None
