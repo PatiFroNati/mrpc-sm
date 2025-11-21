@@ -34,7 +34,8 @@ if uploaded_files:
             
             df = string['data']
             st.dataframe(df)
-            fig = plot_target_with_scores(string)
+            result = plot_target_with_scores(string)
+            fig = result[0] if isinstance(result, tuple) else result
             st.pyplot(fig)
             plt.close(fig)
             # Optionally, provide download link for the plot
