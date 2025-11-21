@@ -39,8 +39,20 @@ if uploaded_files:
                 "Time": df['time'].values
             }
             summary_df = pd.DataFrame(summary_data)
-            summary_df.loc['Total'] = summary_df.sum(numeric_only=True)
-            st.table(summary_df)
+            # transpose so rows become Shot Number, Score, Time and columns are each shot
+            summary_df_t = summary_df.T
+            # use shot ids as column names (fall back to index-based names if needed)
+            try:
+                summary_df_t.columns = df['id'].astype(str).values
+            except Exception:
+                summary_df_t.columns = [f"Shot {i+1}" for i in range(len(df))]
+            # add a Total column (sums for each row)
+            summary_df_t['Total'] = [
+                df['id'].sum(),
+                df['score'].sum(),
+                df['time'].sum()
+            ]
+            st.table(summary_df_t)
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
             st.pyplot(fig)
