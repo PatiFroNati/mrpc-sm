@@ -48,9 +48,9 @@ if uploaded_files:
                 summary_df_t.columns = [f"Shot {i+1}" for i in range(len(df))]
             # add a Total column (sums for each row)
             summary_df_t['Total'] = [
-                df['id'].sum(),
+                '',
                 df['score'].sum(),
-                df['time'].sum()
+                ''
             ]
             st.table(summary_df_t)
             result = plot_target_with_scores(string)
