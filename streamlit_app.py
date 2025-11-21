@@ -9,6 +9,8 @@ import os
 import io
 from PIL import Image
 
+from shotmarker_parser import parse_shotmarker_csv
+
 st.title("MRPC Shotmarker Data Explorer")
 st.write(
     "Upload your MRPC shotmarker data files to visualize and analyze your shooting sessions."
