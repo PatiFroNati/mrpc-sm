@@ -34,7 +34,7 @@ if uploaded_files:
             
             df = string['data']
             summary_data = {
-                "Shot Number": df['shot_number'].values,
+                "Shot Number": df['id'].values,
                 "Score": df['score'].values,
                 "Time": df['time'].values
             }
