@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
 
-
 def plot_target_with_scores(string_data, target_size_mm=None):
     """Enhanced target plot with shot scores and calculated target size."""
     

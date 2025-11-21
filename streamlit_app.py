@@ -36,6 +36,19 @@ if uploaded_files:
             st.dataframe(df)
             fig = plot_target_with_scores(string)
             st.pyplot(fig)
+            plt.close(fig)
+            # Optionally, provide download link for the plot
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            buf.seek(0)
+            st.download_button(
+                label="Download Target Plot as PNG",
+                data=buf,
+                file_name=f"target_plot_string_{i+1}.png",
+                mime="image/png"
+            )
+            buf.close()
+            
             
 
 
