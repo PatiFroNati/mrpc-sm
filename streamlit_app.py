@@ -1,6 +1,10 @@
 import streamlit as st
 
-st.title("🎈 My new app")
+st.title("MRPC Shotmarker Data Explorer")
 st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
+    "Upload your MRPC shotmarker data files to visualize and analyze your shooting sessions."
 )
+uploaded_files = st.file_uploader(
+    "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv"]
+)   
+
