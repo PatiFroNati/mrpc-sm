@@ -76,7 +76,7 @@ if uploaded_files:
 
             # add a Total column (sum of integer-converted scores, with blanks for non-score rows)
             summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
-            st.table(summary_df_t)
+            st.dataframe(summary_df_t, use_container_width=True)
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
             st.pyplot(fig)
