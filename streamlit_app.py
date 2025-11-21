@@ -10,6 +10,7 @@ import io
 from PIL import Image
 
 from shotmarker_parser import parse_shotmarker_csv
+from plot_target import plot_target_with_scores
 
 st.title("MRPC Shotmarker Data Explorer")
 st.write(
@@ -33,7 +34,11 @@ if uploaded_files:
             
             df = string['data']
             st.dataframe(df)
+            fig = plot_target_with_scores(string)
+            st.pyplot(fig)
             
+
+
             
 
 
