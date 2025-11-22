@@ -78,12 +78,11 @@ if uploaded_files:
             # summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
             # st.dataframe(summary_df_t, use_container_width=True)
             # show plot and scores side-by-side
-            left_col, right_col = st.columns([1, 1])
-            plt.figure(figsize=(4, 4))  # Set the desired figure size
+            left_col, right_col = st.columns([2, 1])
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
             with left_col:
-                st.pyplot(fig, use_column_width=True)
+                st.pyplot(fig)
             with right_col:
                 st.dataframe(summary_df_t, use_container_width=True)
             # do not close the figure here because it's used below for the download button
