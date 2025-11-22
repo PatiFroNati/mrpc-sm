@@ -12,13 +12,14 @@ from PIL import Image
 from shotmarker_parser import parse_shotmarker_csv
 from plot_target import plot_target_with_scores
 
+st.set_page_config(page_title="MRPC Shotmarker Data Explorer", layout="wide")
 st.title("MRPC Shotmarker Data Explorer")
 st.write(
     "Upload your MRPC shotmarker data files to visualize and analyze your shooting sessions."
 )
 uploaded_files = st.file_uploader(
     "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv", "excel"]
-)   
+)
 
 
 
