@@ -51,13 +51,13 @@
       "unit": "mm",
       "grid_size_moa_quarter": 20.1,
       "rings": [
-        { "ring": "X", "diameter": 72.39, "points": 10 },
-        { "ring": "10", "diameter": 148.59, "points": 10 },
-        { "ring": "9", "diameter": 224.79, "points": 9 },
-        { "ring": "8", "diameter": 300.99, "points": 8 },
-        { "ring": "7", "diameter": 453.39, "points": 7 },
-        { "ring": "6", "diameter": 605.79, "points": 6 },
-        { "ring": "5", "diameter": 757.79, "points": 5 }
+        { "ring": "X", "diameter": 72.39, "color": "#000000", "points": 10 },
+        { "ring": "10", "diameter": 148.59, "color": "#000000", "points": 10 },
+        { "ring": "9", "diameter": 224.79, "color": "#000000", "points": 9 },
+        { "ring": "8", "diameter": 300.99, "color": "#000000", "points": 8 },
+        { "ring": "7", "diameter": 453.39, "color": "#000000", "points": 7 },
+        { "ring": "6", "diameter": 605.79, "color": "#F5F5DC", "points": 6 },
+        { "ring": "5", "diameter": 757.79, "color": "#F5F5DC", "points": 5 }
       ]
     }
   ]
