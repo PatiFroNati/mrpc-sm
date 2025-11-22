@@ -4,7 +4,6 @@ from matplotlib.ticker import MultipleLocator
 
 import json
 import os
-import pandas as pd
 
 # Load target specs JSON from the project folder (same directory as this script)
 TARGET_SPECS_RAW = {}
@@ -28,46 +27,6 @@ try:
 except Exception:
     TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
-
-def _find_target_spec_case_insensitive(target_type):
-    """Find target spec by case-insensitive matching, also handles partial matches."""
-    if not target_type:
-        return None
-    target_type_lower = target_type.lower().strip()
-    
-    # First try exact case-insensitive match
-    for key, spec in TARGET_SPECS.items():
-        if key.lower() == target_type_lower:
-            return spec
-    
-    # Extract key identifier from target_type (e.g., "mr-1fc" from "nra mr-1fc")
-    # Look for patterns like "mr-1fc", "sr-3", "sr", "mr-63", etc.
-    target_words = target_type_lower.split()
-    key_identifiers = []
-    for word in target_words:
-        # Look for patterns like "mr-1fc", "sr-3", "mr-63"
-        if '-' in word and any(c.isdigit() for c in word):
-            key_identifiers.append(word)
-        elif word in ['sr', 'mr']:
-            key_identifiers.append(word)
-    
-    # Try to find match by key identifier (most specific)
-    if key_identifiers:
-        for key, spec in TARGET_SPECS.items():
-            key_lower = key.lower()
-            # Check if any key identifier is in the target spec name
-            for identifier in key_identifiers:
-                if identifier in key_lower:
-                    return spec
-    
-    # Fallback: try partial match (e.g., "nra mr-1fc" matches "NRA MR-1FC at 600y")
-    # Only match if target_type is contained in key (not vice versa, to avoid false matches)
-    for key, spec in TARGET_SPECS.items():
-        key_lower = key.lower()
-        if target_type_lower in key_lower:
-            return spec
-    
-    return None
     
 def get_target_spec_for(string_data):
     """Return target_spec dict: prefer string_data['target_spec'], else lookup by target type in TARGET_SPECS."""
@@ -82,9 +41,10 @@ def get_target_spec_for(string_data):
             target_type = data['target_info'].iloc[0]
         elif 'target_type' in string_data:
             target_type = string_data['target_type']
-    if target_type:
-        return _find_target_spec_case_insensitive(target_type)
+    if target_type and target_type in TARGET_SPECS:
+        return TARGET_SPECS[target_type]
     return None
+    return TARGET_SPECS
 
 
 def plot_target_with_scores(string_data, target_size_mm=None):
@@ -114,24 +74,8 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     # Draw target rings based on specifications
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
-        # Handle NaN, None, or empty string
-        if pd.isna(target_type) or not str(target_type).strip():
-            target_type = None
-        else:
-            target_type = str(target_type).strip()
-        
-        # Debug: print what we're looking for (visible in console/terminal)
-        if target_type:
-            print(f"DEBUG: Looking for target type: '{target_type}'")
-            print(f"DEBUG: Available targets: {list(TARGET_SPECS.keys())}")
-        
-        # Match target_type to spec by name (case-insensitive)
-        spec = _find_target_spec_case_insensitive(target_type) if target_type else None
-        
-        if spec:
-            print(f"DEBUG: Found matching target spec: {spec.get('type', 'Unknown')}")
-        else:
-            print(f"DEBUG: No matching target spec found for '{target_type}'")
+        # Match target_type to spec by name
+        spec = TARGET_SPECS.get(target_type)
         
         if spec:
             # Draw rings from largest to smallest (so smaller rings are on top)
@@ -182,12 +126,9 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     grid_size_mm = None
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
-        # Handle NaN, None, or empty string
-        if not pd.isna(target_type) and str(target_type).strip():
-            target_type = str(target_type).strip()
-            spec = _find_target_spec_case_insensitive(target_type)
-            if spec and 'grid_size_moa_quarter' in spec:
-                grid_size_mm = spec['grid_size_moa_quarter']
+        spec = TARGET_SPECS.get(target_type)
+        if spec and 'grid_size_moa_quarter' in spec:
+            grid_size_mm = spec['grid_size_moa_quarter']
     
     if grid_size_mm:
         ax.xaxis.set_major_locator(MultipleLocator(grid_size_mm))
