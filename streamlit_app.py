@@ -85,7 +85,7 @@ if uploaded_files:
             # summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
             # st.dataframe(summary_df_t, use_container_width=True)
             # show plot and scores side-by-side
-            left_col, right_col = st.columns([1, 3])
+            left_col, right_col = st.columns([1, 4])
             result = plot_target_with_scores(string)
             fig = result[0] if isinstance(result, tuple) else result
             with left_col:
