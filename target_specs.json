@@ -71,7 +71,8 @@
         { "ring": "9", "diameter": 304.8, "color": "#000000", "points": 9 },
         { "ring": "8", "diameter": 457.2, "color": "#000000", "points": 8 },
         { "ring": "7", "diameter": 609.6, "color": "#000000", "points": 7 },
-        { "ring": "6", "diameter": 914.4, "color": "#FFFFFF", "points": 6 }
+        { "ring": "6", "diameter": 914.4, "color": "#FFFFFF", "points": 6 },
+        { "ring": "5", "diameter": 1219.2, "color": "#FFFFFF", "points": 5 }
       ]
     }
   ]
