@@ -21,15 +21,17 @@ def plot_target_with_scores(string_data, target_size_mm=None):
             target_size_mm = 50
     
     # Draw target rings based on specifications
-    if 'target_spec' in string_data:
-        spec = string_data['target_spec']
-        for ring in spec.get('rings', []):
-            radius = ring['radius_mm']
-            circle = Circle((0, 0), radius, fill=False, 
-                           edgecolor=ring.get('color', 'black'), 
-                           linewidth=ring.get('linewidth', 1.5), 
-                           alpha=ring.get('alpha', 0.8))
-            ax.add_patch(circle)
+    if len(shots) > 0 and 'target_info' in shots.columns:
+        target_type = shots['target_info'].iloc[0]
+        if 'target_spec' in string_data and target_type in string_data['target_spec']:
+            spec = string_data['target_spec'][target_type]
+            for ring in spec.get('rings', []):
+                radius = ring['radius_mm']
+                circle = Circle((0, 0), radius, fill=False, 
+                               edgecolor=ring.get('color', 'black'), 
+                               linewidth=ring.get('linewidth', 1.5), 
+                               alpha=ring.get('alpha', 0.8))
+                ax.add_patch(circle)
     
     # Plot shots with IDs inside markers
     if len(shots) > 0:
@@ -41,7 +43,6 @@ def plot_target_with_scores(string_data, target_size_mm=None):
             ax.annotate(str(shot['id']), (shot['x_mm'], shot['y_mm']),
                        fontsize=8, ha='center', va='center',
                        color='white', weight='bold', zorder=6)
-    
     # Plot sighters
     if len(sighters) > 0:
         ax.scatter(sighters['x_mm'], sighters['y_mm'],
