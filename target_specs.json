@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "type": "200-Yard SR Target",
+      "type": "NRA SR at 200y",
       "distance": "200 yards",
       "unit": "mm",
       "grid_size_moa_quarter": 13.4,
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "type": "300-Yard SR-3 Target",
+      "type": "NA SR-3 at 300y",
       "distance": "300 yards",
       "unit": "mm",
       "grid_size_moa_quarter": 20.1,
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "type": "600-Yard MR Target",
+      "type": "NRA MR at 600y",
       "distance": "600 yards",
       "unit": "mm",
       "grid_size_moa_quarter": 40.2,
