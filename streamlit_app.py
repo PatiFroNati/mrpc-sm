@@ -79,7 +79,7 @@ if uploaded_files:
             # st.dataframe(summary_df_t, use_container_width=True)
             # show plot and scores side-by-side
             left_col, right_col = st.columns([1, 1])
-            result = plot_target_with_scores(string, figsize=(4, 4))
+            result = plot_target_with_scores(string, (4, 4))
             fig = result[0] if isinstance(result, tuple) else result
             with left_col:
                 st.pyplot(fig, use_column_width=True)
