@@ -1,9 +1,31 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
-from target_specs import load_target_specs
 import json
 import os
+
+# Load target specs JSON from the project folder (same directory as this script)
+TARGET_SPECS = {}
+try:
+    _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    _CANDIDATE_FILES = [
+        os.path.join(_THIS_DIR, 'target_specs.json'),
+        os.path.join(_THIS_DIR, 'target-specs.json'),
+        os.path.join(_THIS_DIR, 'targets.json'),
+    ]
+    for _path in _CANDIDATE_FILES:
+        if os.path.exists(_path):
+            with open(_path, 'r', encoding='utf-8') as _f:
+                TARGET_SPECS = json.load(_f)
+            break
+except Exception:
+    TARGET_SPECS = {}
+
+def get_target_spec_for(string_data):
+    """Return target_spec dict: prefer string_data['target_spec'] else fall back to loaded TARGET_SPECS."""
+    if isinstance(string_data, dict) and 'target_spec' in string_data:
+        return string_data['target_spec']
+    return TARGET_SPECS
 
 
 def plot_target_with_scores(string_data, target_size_mm=None):
