@@ -86,7 +86,7 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                             "pitch_deg": float(parts[10]) if parts[10] else None,
                             "quality": float(parts[11]) if parts[11] else None,
                             "xy_err": float(parts[12]) if parts[12] else None,
-                            "target_info": current_string.get("course_data", ""),
+                            "target_info": current_string.get("course", ""),
                         }
                         current_data.append(shot_data)
                     except (ValueError, IndexError):
