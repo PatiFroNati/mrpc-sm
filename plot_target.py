@@ -103,13 +103,13 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     sighter_handle = None
     if len(shots) > 0:
         shot_handle = ax.scatter(shots['x_mm'], shots['y_mm'], 
-                  c='blue', s=150, alpha=0.6, 
-                  edgecolors='darkblue', linewidth=2, label='Shots', zorder=5)
+              c='blue', s=220, alpha=0.6, 
+              edgecolors='darkblue', linewidth=2.5, label='Shots', zorder=5)
         
         for _, shot in shots.iterrows():
             ax.annotate(str(shot['id']), (shot['x_mm'], shot['y_mm']),
-                       fontsize=8, ha='center', va='center',
-                       color='white', weight='bold', zorder=6)
+                   fontsize=8, ha='center', va='center',
+                   color='white', weight='bold', zorder=6)
     # Plot sighters
     if len(sighters) > 0:
         sighter_handle = ax.scatter(sighters['x_mm'], sighters['y_mm'],
