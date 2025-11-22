@@ -27,6 +27,23 @@ try:
 except Exception:
     TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
+
+def _find_target_spec_case_insensitive(target_type):
+    """Find target spec by case-insensitive matching, also handles partial matches."""
+    if not target_type:
+        return None
+    target_type_lower = target_type.lower().strip()
+    # First try exact case-insensitive match
+    for key, spec in TARGET_SPECS.items():
+        if key.lower() == target_type_lower:
+            return spec
+    # Then try partial match (e.g., "nra mr-1fc" matches "NRA MR-1FC at 600y")
+    for key, spec in TARGET_SPECS.items():
+        key_lower = key.lower()
+        # Check if target_type is contained in key or vice versa
+        if target_type_lower in key_lower or key_lower in target_type_lower:
+            return spec
+    return None
     
 def get_target_spec_for(string_data):
     """Return target_spec dict: prefer string_data['target_spec'], else lookup by target type in TARGET_SPECS."""
@@ -41,8 +58,8 @@ def get_target_spec_for(string_data):
             target_type = data['target_info'].iloc[0]
         elif 'target_type' in string_data:
             target_type = string_data['target_type']
-    if target_type and target_type in TARGET_SPECS:
-        return TARGET_SPECS[target_type]
+    if target_type:
+        return _find_target_spec_case_insensitive(target_type)
     return None
     return TARGET_SPECS
 
@@ -74,8 +91,8 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     # Draw target rings based on specifications
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
-        # Match target_type to spec by name
-        spec = TARGET_SPECS.get(target_type)
+        # Match target_type to spec by name (case-insensitive)
+        spec = _find_target_spec_case_insensitive(target_type)
         
         if spec:
             # Draw rings from largest to smallest (so smaller rings are on top)
@@ -126,7 +143,7 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     grid_size_mm = None
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
-        spec = TARGET_SPECS.get(target_type)
+        spec = _find_target_spec_case_insensitive(target_type)
         if spec and 'grid_size_moa_quarter' in spec:
             grid_size_mm = spec['grid_size_moa_quarter']
     
