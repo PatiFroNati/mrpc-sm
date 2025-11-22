@@ -59,6 +59,28 @@
         { "ring": "6", "diameter": 605.79, "color": "#F5F5DC", "points": 6 },
         { "ring": "5", "diameter": 757.79, "color": "#F5F5DC", "points": 5 }
       ]
+    },
+    {
+      "type": "NRA MR-1FC at 600y",
+      "distance": "600 yards",
+      "unit": "mm",
+      "grid_size_moa_quarter": 40.2,
+      "rings": [
+        { "ring": "X", "diameter": 76.20, "color": "#000000", "points": 10 },
+        { "ring": "10", "diameter": 152.40, "color": "#000000", "points": 10 },
+        { "ring": "9", "diameter": 304.80, "color": "#000000", "points": 9 },
+        { "ring": "8", "diameter": 457.20, "color": "#000000", "points": 8 },
+        { "ring": "7", "diameter": 609.60, "color": "#000000", "points": 7 },
+        { "ring": "6", "diameter": 914.40, "color": "#FFFFFF", "points": 6 }
+      ]
     }
   ]
 }
+
+
+X ring: 3.00 inches in diameter, colored black.
+10 ring: 6.00 inches in diameter, colored black.
+9 ring: 12.00 inches in diameter, colored black.
+8 ring: 18.00 inches in diameter, colored black.
+7 ring: 24.00 inches in diameter, colored black.
+6 ring: 36.00 inches in diameter, colored white.
