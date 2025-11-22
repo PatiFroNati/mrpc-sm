@@ -27,11 +27,22 @@ try:
 except Exception:
     TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
-
 def get_target_spec_for(string_data):
-    """Return target_spec dict: prefer string_data['target_spec'] else fall back to loaded TARGET_SPECS."""
+    """Return target_spec dict: prefer string_data['target_spec'], else lookup by target type in TARGET_SPECS."""
     if isinstance(string_data, dict) and 'target_spec' in string_data:
         return string_data['target_spec']
+    # Try to get target type from string_data and lookup in TARGET_SPECS
+    target_type = None
+    if isinstance(string_data, dict):
+        # Try to get target type from shots if available
+        data = string_data.get('data')
+        if data is not None and hasattr(data, 'columns') and 'target_info' in data.columns:
+            target_type = data['target_info'].iloc[0]
+        elif 'target_type' in string_data:
+            target_type = string_data['target_type']
+    if target_type and target_type in TARGET_SPECS:
+        return TARGET_SPECS[target_type]
+    return None
     return TARGET_SPECS
 
 
