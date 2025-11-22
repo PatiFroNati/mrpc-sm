@@ -20,6 +20,11 @@ def plot_target_with_scores(string_data, target_size_mm=None):
         if target_size_mm < 50:
             target_size_mm = 50
     
+    ax.set_aspect('equal')
+    limit = target_size_mm / 2 * 1.1
+    ax.set_xlim(-limit, limit)
+    ax.set_ylim(-limit, limit)
+    
     # Draw target rings based on specifications
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
@@ -51,11 +56,10 @@ def plot_target_with_scores(string_data, target_size_mm=None):
                   marker='s', label='Sighters', zorder=5)
         
         for _, shot in sighters.iterrows():
-            label = f"{shot['id']}\n({shot['score']})"
-            ax.annotate(label, (shot['x_mm'], shot['y_mm']),
+            ax.annotate(str(shot['id']), (shot['x_mm'], shot['y_mm']),
                        fontsize=8, ha='center', va='center',
-                       color='white', weight='bold')
-    
+                       color='white', weight='bold', zorder=6)
+    ax.grid(True, alpha=0.3)
     ax.set_aspect('equal')
     limit = target_size_mm / 2 * 1.1
     ax.set_xlim(-limit, limit)
