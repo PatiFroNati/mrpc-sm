@@ -103,7 +103,7 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     sighter_handle = None
     if len(shots) > 0:
         shot_handle = ax.scatter(shots['x_mm'], shots['y_mm'], 
-              c='blue', s=350, alpha=0.6, 
+              c='blue', s=500, alpha=0.6, 
               edgecolors='darkblue', linewidth=2.5, label='Shots', zorder=5)
         
         for _, shot in shots.iterrows():
