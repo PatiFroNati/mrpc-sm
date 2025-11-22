@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
+from matplotlib.ticker import MultipleLocator
 
 import json
 import os
@@ -48,7 +49,8 @@ def plot_target_with_scores(string_data, target_size_mm=None):
         x_max = shots['x_mm'].abs().max() if len(shots) > 0 else 0
         y_max = shots['y_mm'].abs().max() if len(shots) > 0 else 0
         farthest = max(x_max, y_max)
-        target_size_mm = (farthest * 2 + 25) // 50 * 50  # Round up to nearest 50mm and add 25mm
+        import math
+        target_size_mm = math.ceil((farthest * 2 + 25) / 50) * 50  # Round up to nearest 50mm and add 25mm
         if target_size_mm < 50:
             target_size_mm = 50
     
@@ -86,8 +88,10 @@ def plot_target_with_scores(string_data, target_size_mm=None):
                 ax.add_patch(edge_circle)
     
     # Plot shots with IDs inside markers
+    shot_handle = None
+    sighter_handle = None
     if len(shots) > 0:
-        ax.scatter(shots['x_mm'], shots['y_mm'], 
+        shot_handle = ax.scatter(shots['x_mm'], shots['y_mm'], 
                   c='blue', s=150, alpha=0.6, 
                   edgecolors='darkblue', linewidth=2, label='Shots', zorder=5)
         
@@ -97,7 +101,7 @@ def plot_target_with_scores(string_data, target_size_mm=None):
                        color='white', weight='bold', zorder=6)
     # Plot sighters
     if len(sighters) > 0:
-        ax.scatter(sighters['x_mm'], sighters['y_mm'],
+        sighter_handle = ax.scatter(sighters['x_mm'], sighters['y_mm'],
                   c='orange', s=150, alpha=0.6,
                   edgecolors='darkorange', linewidth=2,
                   marker='s', label='Sighters', zorder=5)
@@ -115,8 +119,8 @@ def plot_target_with_scores(string_data, target_size_mm=None):
             grid_size_mm = spec['grid_size_moa_quarter']
     
     if grid_size_mm:
-        ax.xaxis.set_major_locator(plt.MultipleLocator(grid_size_mm))
-        ax.yaxis.set_major_locator(plt.MultipleLocator(grid_size_mm))
+        ax.xaxis.set_major_locator(MultipleLocator(grid_size_mm))
+        ax.yaxis.set_major_locator(MultipleLocator(grid_size_mm))
     
     ax.grid(True, alpha=0.3)
     ax.set_aspect('equal')
@@ -128,9 +132,11 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     ax.axvline(x=0, color='k', linestyle='--', alpha=0.3)
     ax.set_xlabel('Horizontal (mm)')
     ax.set_ylabel('Vertical (mm)')
-    
+    title = f"{string_data.get('shooter', 'Unknown Shooter')} - {string_data.get('course', 'Unknown Course')}\n{string_data.get('rifle', 'Unknown Rifle')}\nScore: {string_data.get('score', 'N/A')}\nTarget: {target_size_mm}mm"
     title = f"{string_data['shooter']} - {string_data['course']}\n{string_data['rifle']}\nScore: {string_data['score']}\nTarget: {target_size_mm}mm"
     ax.set_title(title, fontsize=11, weight='bold')
-    ax.legend()
+    handles, labels = ax.get_legend_handles_labels()
+    if handles:
+        ax.legend()
     
     return fig, ax
