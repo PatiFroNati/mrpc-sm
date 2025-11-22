@@ -27,6 +27,7 @@ try:
 except Exception:
     TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
+    
 def get_target_spec_for(string_data):
     """Return target_spec dict: prefer string_data['target_spec'], else lookup by target type in TARGET_SPECS."""
     if isinstance(string_data, dict) and 'target_spec' in string_data:
