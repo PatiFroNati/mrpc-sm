@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
+from target_specs import load_target_specs
+import json
+import os
+
 
 def plot_target_with_scores(string_data, target_size_mm=None):
     """Enhanced target plot with shot scores and calculated target size."""
