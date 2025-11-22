@@ -5,7 +5,8 @@ import json
 import os
 
 # Load target specs JSON from the project folder (same directory as this script)
-TARGET_SPECS = {}
+TARGET_SPECS_RAW = {}
+TARGET_SPECS = {}  # Dictionary indexed by type name for quick lookup
 try:
     _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
     _CANDIDATE_FILES = [
@@ -16,9 +17,14 @@ try:
     for _path in _CANDIDATE_FILES:
         if os.path.exists(_path):
             with open(_path, 'r', encoding='utf-8') as _f:
-                TARGET_SPECS = json.load(_f)
+                TARGET_SPECS_RAW = json.load(_f)
+            # Build a lookup dictionary by type name
+            if 'targets' in TARGET_SPECS_RAW:
+                for target in TARGET_SPECS_RAW['targets']:
+                    TARGET_SPECS[target['type']] = target
             break
 except Exception:
+    TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
 
 def get_target_spec_for(string_data):
@@ -54,15 +60,30 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     # Draw target rings based on specifications
     if len(shots) > 0 and 'target_info' in shots.columns:
         target_type = shots['target_info'].iloc[0]
-        if 'target_spec' in string_data and target_type in string_data['target_spec']:
-            spec = string_data['target_spec'][target_type]
-            for ring in spec.get('rings', []):
-                radius = ring['radius_mm']
-                circle = Circle((0, 0), radius, fill=False, 
-                               edgecolor=ring.get('color', 'black'), 
-                               linewidth=ring.get('linewidth', 1.5), 
-                               alpha=ring.get('alpha', 0.8))
+        # Match target_type to spec by name
+        spec = TARGET_SPECS.get(target_type)
+        
+        if spec:
+            # Draw rings from largest to smallest (so smaller rings are on top)
+            rings = spec.get('rings', [])
+            # Sort by diameter descending to draw outer rings first
+            rings_sorted = sorted(rings, key=lambda r: r.get('diameter', 0), reverse=True)
+            
+            for ring in rings_sorted:
+                # Convert diameter to radius
+                radius = ring.get('diameter', 0) / 2.0
+                color = ring.get('color', '#000000')
+                
+                # Create circle with fill for better visibility
+                circle = Circle((0, 0), radius, fill=True, 
+                               facecolor=color, edgecolor='black',
+                               linewidth=1, alpha=0.3, zorder=1)
                 ax.add_patch(circle)
+                
+                # Add edge outline for clarity
+                edge_circle = Circle((0, 0), radius, fill=False,
+                                    edgecolor='black', linewidth=1.5, alpha=0.6, zorder=2)
+                ax.add_patch(edge_circle)
     
     # Plot shots with IDs inside markers
     if len(shots) > 0:
