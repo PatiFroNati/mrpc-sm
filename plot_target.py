@@ -44,7 +44,6 @@ def get_target_spec_for(string_data):
     if target_type and target_type in TARGET_SPECS:
         return TARGET_SPECS[target_type]
     return None
-    return TARGET_SPECS
 
 
 def plot_target_with_scores(string_data, target_size_mm=None):
