@@ -46,10 +46,10 @@ def get_target_spec_for(string_data):
     return TARGET_SPECS
 
 
-def plot_target_with_scores(string_data, target_size_mm=None):
+def plot_target_with_scores(string_data, target_size_mm=None, figsize=(8, 8)):
     """Enhanced target plot with shot scores and calculated target size."""
     
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
     
     df = string_data['data']
     sighters = df[df['tags'] == 'sighter']
