@@ -106,6 +106,18 @@ def plot_target_with_scores(string_data, target_size_mm=None):
             ax.annotate(str(shot['id']), (shot['x_mm'], shot['y_mm']),
                        fontsize=8, ha='center', va='center',
                        color='white', weight='bold', zorder=6)
+    # Set grid size from target specs if available
+    grid_size_mm = None
+    if len(shots) > 0 and 'target_info' in shots.columns:
+        target_type = shots['target_info'].iloc[0]
+        spec = TARGET_SPECS.get(target_type)
+        if spec and 'grid_size_moa_quarter' in spec:
+            grid_size_mm = spec['grid_size_moa_quarter']
+    
+    if grid_size_mm:
+        ax.xaxis.set_major_locator(plt.MultipleLocator(grid_size_mm))
+        ax.yaxis.set_major_locator(plt.MultipleLocator(grid_size_mm))
+    
     ax.grid(True, alpha=0.3)
     ax.set_aspect('equal')
     limit = target_size_mm / 2 * 1.1
