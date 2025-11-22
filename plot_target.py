@@ -138,10 +138,10 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     limit = target_size_mm / 2 * 1.1
     ax.set_xlim(-limit, limit)
     ax.set_ylim(-limit, limit)
-    ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color='k', linestyle='--', alpha=0.3)
     ax.axvline(x=0, color='k', linestyle='--', alpha=0.3)
-    # Removed x and y labels
+    # Removed x and y labels and hide tick labels (grid labels)
+    ax.tick_params(axis='both', which='both', labelbottom=False, labelleft=False)
     title = f"{string_data['shooter']} - {string_data['course']}\n{string_data['rifle']}\nScore: {string_data['score']}\nTarget: {target_size_mm}mm"
     ax.set_title(title, fontsize=11, weight='bold')
     handles, labels = ax.get_legend_handles_labels()
