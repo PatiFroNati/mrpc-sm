@@ -20,17 +20,16 @@ def plot_target_with_scores(string_data, target_size_mm=None):
         if target_size_mm < 50:
             target_size_mm = 50
     
-    # Draw target rings
-    for radius_fraction in [1.0, 0.8, 0.6, 0.4, 0.2]:
-        radius = target_size_mm/2 * radius_fraction
-        circle = Circle((0, 0), radius, fill=False, 
-                       edgecolor='black', linewidth=1.5, alpha=0.8)
-        ax.add_patch(circle)
-    
-    # X-ring
-    x_ring = Circle((0, 0), target_size_mm/2 * 0.1, fill=False,
-                   edgecolor='red', linewidth=2.5)
-    ax.add_patch(x_ring)
+    # Draw target rings based on specifications
+    if 'target_spec' in string_data:
+        spec = string_data['target_spec']
+        for ring in spec.get('rings', []):
+            radius = ring['radius_mm']
+            circle = Circle((0, 0), radius, fill=False, 
+                           edgecolor=ring.get('color', 'black'), 
+                           linewidth=ring.get('linewidth', 1.5), 
+                           alpha=ring.get('alpha', 0.8))
+            ax.add_patch(circle)
     
     # Plot shots with IDs inside markers
     if len(shots) > 0:
