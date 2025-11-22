@@ -27,7 +27,7 @@ try:
 except Exception:
     TARGET_SPECS_RAW = {}
     TARGET_SPECS = {}
-    
+
 def get_target_spec_for(string_data):
     """Return target_spec dict: prefer string_data['target_spec'], else lookup by target type in TARGET_SPECS."""
     if isinstance(string_data, dict) and 'target_spec' in string_data:
@@ -133,14 +133,17 @@ def plot_target_with_scores(string_data, target_size_mm=None):
     if grid_size_mm:
         ax.xaxis.set_major_locator(MultipleLocator(grid_size_mm))
         ax.yaxis.set_major_locator(MultipleLocator(grid_size_mm))
-    
-    ax.grid(True, alpha=0.3)
+
+    # Ensure grid lines are drawn on top of the target rings
+    ax.set_axisbelow(False)
+    ax.grid(True, alpha=0.6, linewidth=0.6, zorder=100)
+
     ax.set_aspect('equal')
     limit = target_size_mm / 2 * 1.1
     ax.set_xlim(-limit, limit)
     ax.set_ylim(-limit, limit)
-    ax.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-    ax.axvline(x=0, color='k', linestyle='--', alpha=0.3)
+    ax.axhline(y=0, color='k', linestyle='--', alpha=0.3, zorder=101)
+    ax.axvline(x=0, color='k', linestyle='--', alpha=0.3, zorder=101)
     # Removed x and y labels and hide tick labels (grid labels)
     ax.tick_params(axis='both', which='both', labelbottom=False, labelleft=False)
     title = f"{string_data['shooter']} - {string_data['course']}\n{string_data['rifle']}\nScore: {string_data['score']}\nTarget: {target_size_mm}mm"
