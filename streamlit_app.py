@@ -92,6 +92,11 @@ if uploaded_files:
                 mime="image/png"
             )
             buf.close()
+
+            # Show raw data toggle
+            if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
+                st.subheader(f"Raw Data for String {i+1}")
+                st.write(df)
             
             
 
