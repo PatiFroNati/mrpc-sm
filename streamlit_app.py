@@ -92,6 +92,12 @@ if uploaded_files:
                 st.pyplot(fig)
             with right_col:
                 st.dataframe(summary_df_t, use_container_width=True)
+
+                # Show raw data toggle
+                if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
+                    st.subheader(f"Raw Data for String {i+1}")
+                    st.write(df)
+            
             # do not close the figure here because it's used below for the download button
             # Optionally, provide download link for the plot
             buf = io.BytesIO()
@@ -105,10 +111,6 @@ if uploaded_files:
             )
             buf.close()
 
-            # Show raw data toggle
-            if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
-                st.subheader(f"Raw Data for String {i+1}")
-                st.write(df)
             
             
 
