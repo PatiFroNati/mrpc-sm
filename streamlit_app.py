@@ -43,7 +43,8 @@ if uploaded_files:
             summary_data = {
                 "Shot Number": df['id'].values,
                 "Score": df['score'].values,
-                "Time": df['time'].values
+                "Time": df['time_between_shots'].values
+                
             }
             summary_df = pd.DataFrame(summary_data)
             # transpose so rows become Shot Number, Score, Time and columns are each shot
