@@ -94,7 +94,7 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                         continue
 
                     #add a unique id that consists of the score from the current string concatenated with the scores from each shot
-                    current_string["unique_id"] = current_string["score"] + "".join(df["score"].values)
+                    current_string["unique_id"] = current_string["score"] + ",".join([str(shot["score"]) for shot in current_data])
 
     # final string
     if current_string and current_data:
