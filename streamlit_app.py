@@ -33,9 +33,15 @@ scores_uploaded_files = st.file_uploader(
 
 # display scores dataframe if a scores file is uploaded
 if scores_uploaded_files:
-    with st.container():
-        scores_df = parse_scores_csv(scores_uploaded_files)
-        st.dataframe(scores_df)
+    try:
+        with st.container():
+            scores_df = parse_scores_csv(scores_uploaded_files)
+            if scores_df.empty:
+                st.warning("The uploaded scores file is empty. Please check the file contents.")
+            else:
+                st.dataframe(scores_df)
+    except Exception as e:
+        st.error(f"Error parsing scores file: {str(e)}")
 
 
 if uploaded_files:
