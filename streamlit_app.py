@@ -37,7 +37,7 @@ if uploaded_files:
         
         for i, string in enumerate(strings):
             st.subheader(f"Shooting String {i+1}: {string['shooter']} - {string['stage']}")
-            st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}")
+            st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}, Unique ID: {string['unique_id']}")
             
             df = string['data']
             summary_data = {
