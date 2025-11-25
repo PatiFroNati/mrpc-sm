@@ -30,6 +30,9 @@ scores_uploaded_files = st.file_uploader(
     "Upload scores data file", accept_multiple_files=False, type=["csv"]
 )
 
+if scores_uploaded_files:
+    df_scores = parse_scores_csv(scores_uploaded_files)
+    st.write(df_scores)
 
 
 
