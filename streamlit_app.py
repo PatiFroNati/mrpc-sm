@@ -86,14 +86,7 @@ if uploaded_files:
             with left_col:
                 st.pyplot(fig)
             with right_col:
-                # Hide dataframe header using CSS
-                # Alternative approach: use AgGrid for dataframe display without a header
-                # If 'st.data_editor' is available, use it with hide_index=True and header_visible=False
-                try:
-                    st.data_editor(summary_df_t, hide_index=True, column_config={}, header_visible=False)
-                    show_custom_df = False  # disable the normal st.dataframe below
-                except Exception:
-                    show_custom_df = True
+                # display summary dataframe without a header and with row labels
                 st.dataframe(summary_df_t, width='stretch', hide_index=True)
 
                 # Show raw data toggle
