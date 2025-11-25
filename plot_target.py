@@ -88,9 +88,16 @@ def plot_target_with_scores(string_data, target_size_mm=None):
                 color = ring.get('color', '#000000')
                 
                 # Create circle with fill for better visibility
-                circle = Circle((0, 0), radius, fill=True, 
-                               facecolor=color, edgecolor='black',
-                               linewidth=1, alpha=0.3, zorder=1)
+                circle = Circle(
+                    (0, 0),
+                    radius,
+                    fill=True,
+                    facecolor=color,  # honor TARGET_SPECS hex colors
+                    edgecolor='black',
+                    linewidth=1,
+                    alpha=1.0,
+                    zorder=1,
+                )
                 ax.add_patch(circle)
                 
                 # Add edge outline for clarity
