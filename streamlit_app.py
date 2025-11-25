@@ -92,7 +92,13 @@ if uploaded_files:
             with left_col:
                 st.pyplot(fig)
             with right_col:
-                st.dataframe(summary_df_t, width='stretch')
+                # Hide dataframe header using CSS
+                st.markdown("""
+                    <style>
+                    .dataframe thead {display: none;}
+                    </style>
+                    """, unsafe_allow_html=True)
+                st.dataframe(summary_df_t, width='stretch', hide_index=True)
 
                 # Show raw data toggle
                 if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
