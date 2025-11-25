@@ -14,10 +14,10 @@ def parse_scores_csv(scores_uploaded_file):
         pd.DataFrame with an added uniq_id column
     """
     # Read the raw file into a DataFrame
-    df_scores = pd.read_csv(scores_uploaded_file)
+    df = pd.read_csv(scores_uploaded_file)
     
     # Find the first row where 'match' equals 'Match'
-    if "Match" in df_scores.columns:
+    if "match" in df.columns:
         # Already parsed correctly, no need to strip
         pass
     else:
@@ -26,13 +26,16 @@ def parse_scores_csv(scores_uploaded_file):
         # Read all lines
         lines = scores_uploaded_file.readlines()
         # Find index of line starting with "match"
-        start_idx = next(i for i, line in enumerate(lines) if line.decode().startswith("Match"))
+        start_idx = next(i for i, line in enumerate(lines) if line.decode().startswith("match"))
         # Reload DataFrame from that line onward
         scores_uploaded_file.seek(0)
-        df_scores = pd.read_csv(pd.compat.StringIO("".join([l.decode() for l in lines[start_idx:]])))
+        df = pd.read_csv(pd.compat.StringIO("".join([l.decode() for l in lines[start_idx:]])))
     
     # Create uniq_id with total first, then shots
-    df_scores["uniq_id"] = df_scores["total"].astype(str) + "," + df_scores ["shots"].astype(str)
-    
+    df["uniq_id"] = df["total"].astype(str) + "," + df["shots"].astype(str)
+
+    #rename df to df_scores
+    df_scores = df
+
     return df_scores
 
