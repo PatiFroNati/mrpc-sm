@@ -31,10 +31,10 @@ scores_uploaded_files = st.file_uploader(
     "Upload scores data file", accept_multiple_files=False, type=["csv"]
 )
 
+#display scores datafram if a scores file is uploaded
 if scores_uploaded_files:
-    df_scores = parse_scores_csv(scores_uploaded_files)
-    st.write(df_scores)
-
+    scores_df = parse_scores_csv(scores_uploaded_files)
+    st.dataframe(scores_df)
 
 
 if uploaded_files:
