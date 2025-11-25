@@ -101,7 +101,7 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
         # Create unique_id: total score + comma-separated individual shot scores
         current_string["unique_id"] = current_string["score"] + "," + ",".join([str(shot["score"]) for shot in current_data])
         # Calculate time between shots and add to current_data
-        current_data["time_between_shots"] = current_data["time"].diff().fillna(0)
+        #current_data["time_between_shots"] = current_data["time"].diff().fillna(0)
         all_strings.append(current_string)
 
     return all_strings
