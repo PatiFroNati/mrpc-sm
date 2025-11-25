@@ -24,10 +24,8 @@ st.write(
 st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max-width:50%;}</style>", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
-    "Upload shot log data file", accept_multiple_files=False, type=["csv"])
-
-
-
+    "Upload shot log data file", accept_multiple_files=False, type=["csv"]
+)
 
 
 if uploaded_files:
@@ -106,6 +104,7 @@ if uploaded_files:
                 mime="image/png"
             )
             buf.close()
+
 
             
             
