@@ -26,13 +26,13 @@ def parse_scores_csv(scores_uploaded_file):
         # Read all lines
         lines = uploaded_file.readlines()
         # Find index of line starting with "match"
-        start_idx = next(i for i, line in enumerate(lines) if line.decode().startswith("match"))
+        start_idx = next(i for i, line in enumerate(lines) if line.decode().startswith("Match"))
         # Reload DataFrame from that line onward
         uploaded_file.seek(0)
         df_scores = pd.read_csv(pd.compat.StringIO("".join([l.decode() for l in lines[start_idx:]])))
     
     # Create uniq_id with total first, then shots
-   df_scores["uniq_id"] = df_scores["total"].astype(str) + "," + df_scores["shots"].astype(str)
+    df["uniq_id"] = df["total"].astype(str) + "," + df["shots"].astype(str)
     
     return df_scores
 
