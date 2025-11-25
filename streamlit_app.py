@@ -10,6 +10,7 @@ import io
 from PIL import Image
 
 from shotmarker_parser import parse_shotmarker_csv
+from score_parser import parse_scores_csv
 from plot_target import plot_target_with_scores
 
 # Must be the first Streamlit call in the file (move this right after `import streamlit as st`)
