@@ -10,7 +10,6 @@ import io
 from PIL import Image
 
 from shotmarker_parser import parse_shotmarker_csv
-from score_parser import parse_scores_csv
 from plot_target import plot_target_with_scores
 
 # Must be the first Streamlit call in the file (move this right after `import streamlit as st`)
@@ -27,21 +26,6 @@ st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max
 uploaded_files = st.file_uploader(
     "Upload shot log data file", accept_multiple_files=False, type=["csv"])
 
-scores_uploaded_files = st.file_uploader(
-    "Upload scores data file", accept_multiple_files=False, type=["csv"]
-)
-
-# display scores dataframe if a scores file is uploaded
-# if scores_uploaded_files:
-#     try:
-#         with st.container():
-#             scores_df = parse_scores_csv(scores_uploaded_files)
-#             if scores_df.empty:
-#                 st.warning("The uploaded scores file is empty. Please check the file contents.")
-#             else:
-#                 st.dataframe(scores_df)
-#     except Exception as e:
-#         st.error(f"Error parsing scores file: {str(e)}")
 
 
 
