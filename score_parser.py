@@ -14,7 +14,7 @@ def parse_scores_csv(scores_uploaded_file):
         pd.DataFrame with an added uniq_id column
     """
     # Read the raw file into a DataFrame
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(scores_uploaded_file)
     
     # Find the first row where 'match' equals 'Match'
     if "match" in df.columns:
