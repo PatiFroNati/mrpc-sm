@@ -33,8 +33,9 @@ scores_uploaded_files = st.file_uploader(
 
 # display scores dataframe if a scores file is uploaded
 if scores_uploaded_files:
-    scores_df = parse_scores_csv(scores_uploaded_files)
-    st.dataframe(scores_df)
+    with st.container():
+        scores_df = parse_scores_csv(scores_uploaded_files)
+        st.dataframe(scores_df)
 
 
 if uploaded_files:
