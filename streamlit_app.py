@@ -43,18 +43,11 @@ if uploaded_files:
             summary_data = {
                 "Shot Number": df['id'].values,
                 "Score": df['score'].values,
-                "Time": df['time_between_shots'].values
-                
-                
+                "Time": df['time'].values
             }
             summary_df = pd.DataFrame(summary_data)
             # transpose so rows become Shot Number, Score, Time and columns are each shot
             summary_df_t = summary_df.T
-            # use shot ids as column names (fall back to index-based names if needed)
-            try:
-                summary_df_t.columns = df['id'].astype(str).values
-            except Exception:
-                summary_df_t.columns = [f"Shot {i+1}" for i in range(len(df))]
             # add a Total column (sums for each row)
             # convert scores for summing (treat 'x' or 'X' as 10) and prepare display values
             def _to_int_score(s):
