@@ -21,10 +21,13 @@ st.write(
 )
 
 # optional CSS to ensure the block container uses full width
-st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max-width:100%;}</style>", unsafe_allow_html=True)
+st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max-width:50%;}</style>", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
-    "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv", "xlsx"]
+    "Upload shot log data file", accept_multiple_files=False, type=["csv"])
+
+scores_uploaded_files = st.file_uploader(
+    "Upload scores data file", accept_multiple_files=False, type=["csv"]
 )
 
 
