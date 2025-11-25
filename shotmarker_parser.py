@@ -43,6 +43,8 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                 # save previous
                 if current_string and current_data:
                     current_string["data"] = pd.DataFrame(current_data)
+                    # Create unique_id: total score + comma-separated individual shot scores
+                    current_string["unique_id"] = current_string["score"] + "," + ",".join([str(shot["score"]) for shot in current_data])
                     all_strings.append(current_string)
 
                 # parse shooter/stage
@@ -93,12 +95,11 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                         # skip malformed shot lines
                         continue
 
-                    #add a unique id that consists of the score from the current string concatenated with the scores from each shot
-                    current_string["unique_id"] = current_string["score"] + ",".join([str(shot["score"]) for shot in current_data])
-
     # final string
     if current_string and current_data:
         current_string["data"] = pd.DataFrame(current_data)
+        # Create unique_id: total score + comma-separated individual shot scores
+        current_string["unique_id"] = current_string["score"] + "," + ",".join([str(shot["score"]) for shot in current_data])
         all_strings.append(current_string)
 
     return all_strings
