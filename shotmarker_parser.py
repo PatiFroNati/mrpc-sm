@@ -93,6 +93,9 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                         # skip malformed shot lines
                         continue
 
+                    #add a unique id that consists of the score from the current string concatenated with the scores from each shot
+                    current_string["unique_id"] = current_string["score"] + "".join(df["score"].values)
+
     # final string
     if current_string and current_data:
         current_string["data"] = pd.DataFrame(current_data)
