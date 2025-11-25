@@ -86,8 +86,8 @@ if uploaded_files:
             with left_col:
                 st.pyplot(fig)
             with right_col:
-                # display summary dataframe without a header and with row labels, excluding first row
-                st.dataframe(summary_df_t.iloc[1:], width='stretch', hide_index=False)
+                # display summary dataframe without a header and with row labels
+                st.dataframe(summary_df_t, width='stretch', hide_index=False)
 
                 # Show raw data toggle
                 if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
