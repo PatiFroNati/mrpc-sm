@@ -32,7 +32,7 @@ uploaded_files = st.file_uploader(
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
-        st.header(f"File: {uploaded_file.name}")
+        # st.header(f"File: {uploaded_file.name}")
         strings = parse_shotmarker_csv(uploaded_file)
         
         for i, string in enumerate(strings):
