@@ -17,7 +17,7 @@ def parse_scores_csv(scores_uploaded_file):
     df = pd.read_csv(scores_uploaded_file)
     
     # Find the first row where 'match' equals 'Match'
-    if "match" in df.columns:
+    if "Match" in df.columns:
         # Already parsed correctly, no need to strip
         pass
     else:
@@ -32,7 +32,7 @@ def parse_scores_csv(scores_uploaded_file):
         df_scores = pd.read_csv(pd.compat.StringIO("".join([l.decode() for l in lines[start_idx:]])))
     
     # Create uniq_id with total first, then shots
-   # df_scores["uniq_id"] = df_scores["total"].astype(str) + "," + df_scores["shots"].astype(str)
+   df_scores["uniq_id"] = df_scores["total"].astype(str) + "," + df_scores["shots"].astype(str)
     
     return df_scores
 
