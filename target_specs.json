@@ -6,9 +6,9 @@
       "unit": "mm",
       "grid_size_moa_quarter": 13.4,
       "rings": [
-        { "ring": "X", "diameter": 76.2, "color": "#000000", "points": 10 },
-        { "ring": "10", "diameter": 177.8, "color": "#000000", "points": 10 },
-        { "ring": "9", "diameter": 330.2, "color": "#000000", "points": 9 },
+        { "ring": "X", "diameter": 76.2, "color": "#71716F", "points": 10 },
+        { "ring": "10", "diameter": 177.8, "color": "#71716F", "points": 10 },
+        { "ring": "9", "diameter": 330.2, "color": "#71716F", "points": 9 },
         { "ring": "8", "diameter": 482.6, "color": "#F5F5DC", "points": 8 },
         { "ring": "7", "diameter": 635.0, "color": "#F5F5DC", "points": 7 },
         { "ring": "6", "diameter": 787.4, "color": "#F5F5DC", "points": 6 },
@@ -21,10 +21,10 @@
       "unit": "mm",
       "grid_size_moa_quarter": 20.1,
       "rings": [
-        { "ring": "X", "diameter": 76.2, "color": "#000000", "points": 10 },
-        { "ring": "10", "diameter": 177.8, "color": "#000000", "points": 10 },
-        { "ring": "9", "diameter": 330.2, "color": "#000000", "points": 9 },
-        { "ring": "8", "diameter": 482.6, "color": "#000000", "points": 8 },
+        { "ring": "X", "diameter": 76.2, "color": "#71716F", "points": 10 },
+        { "ring": "10", "diameter": 177.8, "color": "#71716F", "points": 10 },
+        { "ring": "9", "diameter": 330.2, "color": "#71716F", "points": 9 },
+        { "ring": "8", "diameter": 482.6, "color": "#71716F", "points": 8 },
         { "ring": "7", "diameter": 635.0, "color": "#F5F5DC", "points": 7 },
         { "ring": "6", "diameter": 787.4, "color": "#F5F5DC", "points": 6 },
         { "ring": "5", "diameter": 939.8, "color": "#F5F5DC", "points": 5 }
@@ -36,11 +36,11 @@
       "unit": "mm",
       "grid_size_moa_quarter": 40.2,
       "rings": [
-        { "ring": "X", "diameter": 152.4, "color": "#000000", "points": 10 },
-        { "ring": "10", "diameter": 304.8, "color": "#000000", "points": 10 },
-        { "ring": "9", "diameter": 457.2, "color": "#000000", "points": 9 },
-        { "ring": "8", "diameter": 609.6, "color": "#000000", "points": 8 },
-        { "ring": "7", "diameter": 914.4, "color": "#000000", "points": 7 },
+        { "ring": "X", "diameter": 152.4, "color": "#71716F", "points": 10 },
+        { "ring": "10", "diameter": 304.8, "color": "#71716F", "points": 10 },
+        { "ring": "9", "diameter": 457.2, "color": "#71716F", "points": 9 },
+        { "ring": "8", "diameter": 609.6, "color": "#71716F", "points": 8 },
+        { "ring": "7", "diameter": 914.4, "color": "#71716F", "points": 7 },
         { "ring": "6", "diameter": 1219.2, "color": "#F5F5DC", "points": 6 },
         { "ring": "5", "diameter": 1524.0, "color": "#F5F5DC", "points": 5 }
       ]
@@ -51,11 +51,11 @@
       "unit": "mm",
       "grid_size_moa_quarter": 20.1,
       "rings": [
-        { "ring": "X", "diameter": 72.39, "color": "#000000", "points": 10 },
-        { "ring": "10", "diameter": 148.59, "color": "#000000", "points": 10 },
-        { "ring": "9", "diameter": 224.79, "color": "#000000", "points": 9 },
-        { "ring": "8", "diameter": 300.99, "color": "#000000", "points": 8 },
-        { "ring": "7", "diameter": 453.39, "color": "#000000", "points": 7 },
+        { "ring": "X", "diameter": 72.39, "color": "#71716F", "points": 10 },
+        { "ring": "10", "diameter": 148.59, "color": "#71716F", "points": 10 },
+        { "ring": "9", "diameter": 224.79, "color": "#71716F", "points": 9 },
+        { "ring": "8", "diameter": 300.99, "color": "#71716F", "points": 8 },
+        { "ring": "7", "diameter": 453.39, "color": "#71716F", "points": 7 },
         { "ring": "6", "diameter": 605.79, "color": "#F5F5DC", "points": 6 },
         { "ring": "5", "diameter": 757.79, "color": "#F5F5DC", "points": 5 }
       ]
@@ -66,11 +66,11 @@
       "unit": "mm",
       "grid_size_moa_quarter": 40.2,
       "rings": [
-        { "ring": "X", "diameter": 76.2, "color": "#000000", "points": 10 },
-        { "ring": "10", "diameter": 152.4, "color": "#000000", "points": 10 },
-        { "ring": "9", "diameter": 304.8, "color": "#000000", "points": 9 },
-        { "ring": "8", "diameter": 457.2, "color": "#000000", "points": 8 },
-        { "ring": "7", "diameter": 609.6, "color": "#000000", "points": 7 },
+        { "ring": "X", "diameter": 76.2, "color": "#71716F", "points": 10 },
+        { "ring": "10", "diameter": 152.4, "color": "#71716F", "points": 10 },
+        { "ring": "9", "diameter": 304.8, "color": "#71716F", "points": 9 },
+        { "ring": "8", "diameter": 457.2, "color": "#71716F", "points": 8 },
+        { "ring": "7", "diameter": 609.6, "color": "#71716F", "points": 7 },
         { "ring": "6", "diameter": 914.4, "color": "#FFFFFF", "points": 6 }
       ]
     }
