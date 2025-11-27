@@ -43,6 +43,27 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                 # save previous
                 if current_string and current_data:
                     current_string["data"] = pd.DataFrame(current_data)
+                    # Add relay, match, and shooter_name columns
+                    shooter_text = current_string.get("shooter", "")
+                    rifle_text = current_string.get("rifle", "")
+                    
+                    # Extract relay (R followed by number)
+                    relay_match = re.search(r'R(\d+)', shooter_text)
+                    relay = relay_match.group(1) if relay_match else None
+                    
+                    # Extract match (M followed by number)
+                    match_match = re.search(r'M(\d+)', shooter_text)
+                    match = match_match.group(1) if match_match else None
+                    
+                    # Extract first word of shooter and concatenate with rifle
+                    shooter_first_word = shooter_text.split()[0] if shooter_text.split() else ""
+                    shooter_name = f"{shooter_first_word} {rifle_text}".strip() if shooter_first_word or rifle_text else ""
+                    
+                    # Add columns to dataframe
+                    current_string["data"]["relay"] = relay
+                    current_string["data"]["match"] = match
+                    current_string["data"]["shooter_name"] = shooter_name
+                    
                     # Create unique_id: total score + comma-separated individual shot scores
                     current_string["unique_id"] = current_string["score"] + "," + ",".join([str(shot["score"]) for shot in current_data])
                     all_strings.append(current_string)
@@ -103,6 +124,27 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
     # final string
     if current_string and current_data:
         current_string["data"] = pd.DataFrame(current_data)
+        # Add relay, match, and shooter_name columns
+        shooter_text = current_string.get("shooter", "")
+        rifle_text = current_string.get("rifle", "")
+        
+        # Extract relay (R followed by number)
+        relay_match = re.search(r'R(\d+)', shooter_text)
+        relay = relay_match.group(1) if relay_match else None
+        
+        # Extract match (M followed by number)
+        match_match = re.search(r'M(\d+)', shooter_text)
+        match = match_match.group(1) if match_match else None
+        
+        # Extract first word of shooter and concatenate with rifle
+        shooter_first_word = shooter_text.split()[0] if shooter_text.split() else ""
+        shooter_name = f"{shooter_first_word} {rifle_text}".strip() if shooter_first_word or rifle_text else ""
+        
+        # Add columns to dataframe
+        current_string["data"]["relay"] = relay
+        current_string["data"]["match"] = match
+        current_string["data"]["shooter_name"] = shooter_name
+        
         # Create unique_id: total score + comma-separated individual shot scores
         current_string["unique_id"] = current_string["score"] + "," + ",".join([str(shot["score"]) for shot in current_data])
         # Calculate time between shots and add to DataFrame (if needed)
