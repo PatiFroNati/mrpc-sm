@@ -36,7 +36,7 @@ scores_uploaded_file = st.file_uploader(
 
 # Process scores CSV file if uploaded (display above shot strings)
 df_scores = None
-shooter_name_mapping = {}
+user_mapping = {}
 if scores_uploaded_file:
     st.header("Scores Data")
     try:
@@ -44,18 +44,18 @@ if scores_uploaded_file:
         st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
         st.dataframe(df_scores, use_container_width=True)
         
-        # Create mapping from uniq_id to shooter name
-        # Try common column names for shooter name
-        shooter_col = None
-        for col_name in ['shooter', 'name', 'shooter_name', 'Name', 'Shooter', 'Shooter Name']:
+        # Create mapping from uniq_id to user column
+        # Try common column names for user
+        user_col = None
+        for col_name in ['user', 'User', 'USER']:
             if col_name in df_scores.columns:
-                shooter_col = col_name
+                user_col = col_name
                 break
         
-        if shooter_col:
-            shooter_name_mapping = dict(zip(df_scores['uniq_id'], df_scores[shooter_col]))
+        if user_col:
+            user_mapping = dict(zip(df_scores['uniq_id'], df_scores[user_col]))
         else:
-            st.warning("Could not find shooter name column in scores CSV. Available columns: " + ", ".join(df_scores.columns))
+            st.warning("Could not find 'user' column in scores CSV. Available columns: " + ", ".join(df_scores.columns))
         
         # Optionally show raw data toggle
         if st.checkbox("Show Raw Data Info", key="scores_raw_data"):
@@ -73,14 +73,22 @@ if uploaded_files:
         all_strings.extend(strings)
     
     # Update shooter names from scores CSV if available
-    if shooter_name_mapping:
+    # If unique_id matches, replace shooter_name with user from scores CSV + rifle from shotmarker data
+    if user_mapping:
         for string in all_strings:
             unique_id = string.get('unique_id', '')
-            if unique_id in shooter_name_mapping:
-                string['shooter'] = shooter_name_mapping[unique_id]
-                # Also update shooter_name in the DataFrame if it exists
+            if unique_id in user_mapping:
+                user_from_scores = user_mapping[unique_id]
+                rifle_from_shotmarker = string.get('rifle', '')
+                # Concatenate user from scores with rifle from shotmarker
+                new_shooter_name = f"{user_from_scores} {rifle_from_shotmarker}".strip()
+                
+                # Update shooter field
+                string['shooter'] = user_from_scores
+                
+                # Update shooter_name in the DataFrame if it exists
                 if 'data' in string and 'shooter_name' in string['data'].columns:
-                    string['data']['shooter_name'] = shooter_name_mapping[unique_id]
+                    string['data']['shooter_name'] = new_shooter_name
     
     # Group strings by shooter name and sort by match
     # Extract match number for sorting (convert to int if possible)
