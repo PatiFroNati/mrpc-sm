@@ -187,11 +187,11 @@ if uploaded_files:
     # Sort shooters alphabetically
     sorted_shooters = sorted(strings_by_shooter.keys())
     
-    # Add dropdown to select shooter
+    # Add dropdown to select shooter in sidebar
     if len(sorted_shooters) > 0:
         # Add "All Shooters" option at the beginning
         shooter_options = ["All Shooters"] + sorted_shooters
-        selected_shooter = st.selectbox(
+        selected_shooter = st.sidebar.selectbox(
             "Select Shooter:",
             options=shooter_options,
             index=0,
