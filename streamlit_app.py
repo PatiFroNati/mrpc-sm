@@ -263,7 +263,7 @@ if uploaded_files:
         # Create display labels for groups
         group_labels = []
         for user, relay, target in sorted_groups:
-            parts = [f"User: {user}"]
+            parts = [f"{user}"]
             if relay:
                 parts.append(f"Relay: {relay}")
             if target:
