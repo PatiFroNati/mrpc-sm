@@ -129,11 +129,11 @@ if uploaded_files:
         # for an missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
         if 'user' in df_scores.columns:
             for index, row in df_scores.iterrows():
-                if pd.isna(row['relay']):
-                    user_val = row['user']
-                    if user_val in relay_mapping:
-                        df_scores.at[index, 'relay'] = relay_mapping[user_val]
-                        df_scores.at[index, 'target'] = target_mapping[user_val]
+            if pd.isna(row['relay']) and pd.isna(row['target']):
+                user_val = row['user']
+                if user_val in relay_mapping:
+                    df_scores.at[index, 'relay'] = relay_mapping[user_val]
+                    df_scores.at[index, 'target'] = target_mapping[user_val]
 
         
         
