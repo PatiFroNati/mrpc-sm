@@ -33,8 +33,21 @@ scores_uploaded_file = st.file_uploader(
     "Choose scores CSV file", accept_multiple_files=False, type=["csv"]
 )
 
-
-
+# Process scores CSV file if uploaded (display above shot strings)
+if scores_uploaded_file:
+    st.header("Scores Data")
+    try:
+        df_scores = parse_scores_csv(scores_uploaded_file)
+        st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
+        st.dataframe(df_scores, use_container_width=True)
+        
+        # Optionally show raw data toggle
+        if st.checkbox("Show Raw Data Info", key="scores_raw_data"):
+            st.subheader("DataFrame Info")
+            st.write(f"Shape: {df_scores.shape}")
+            st.write(f"Columns: {list(df_scores.columns)}")
+    except Exception as e:
+        st.error(f"Error processing scores CSV file: {str(e)}")
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
@@ -112,20 +125,4 @@ if uploaded_files:
                 mime="image/png"
             )
             buf.close()
-
-# Process scores CSV file if uploaded
-if scores_uploaded_file:
-    st.header("Scores Data")
-    try:
-        df_scores = parse_scores_csv(scores_uploaded_file)
-        st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
-        st.dataframe(df_scores, use_container_width=True)
-        
-        # Optionally show raw data toggle
-        if st.checkbox("Show Raw Data Info", key="scores_raw_data"):
-            st.subheader("DataFrame Info")
-            st.write(f"Shape: {df_scores.shape}")
-            st.write(f"Columns: {list(df_scores.columns)}")
-    except Exception as e:
-        st.error(f"Error processing scores CSV file: {str(e)}")
             
