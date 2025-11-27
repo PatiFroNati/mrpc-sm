@@ -79,6 +79,45 @@ if uploaded_files:
         strings = parse_shotmarker_csv(uploaded_file)
         all_strings.extend(strings)
     
+    # Create mappings from unique_id to relay, match_id, and target (rifle) from all_strings
+    relay_mapping = {}
+    match_id_mapping = {}
+    target_mapping = {}
+    
+    for string in all_strings:
+        unique_id = string.get('unique_id', '')
+        if unique_id:
+            # Extract relay from data DataFrame (all rows should have the same relay)
+            if 'data' in string and 'relay' in string['data'].columns:
+                relay_vals = string['data']['relay'].dropna().unique()
+                if len(relay_vals) > 0:
+                    relay_mapping[unique_id] = relay_vals[0]
+            
+            # Extract match from data DataFrame (all rows should have the same match)
+            if 'data' in string and 'match' in string['data'].columns:
+                match_vals = string['data']['match'].dropna().unique()
+                if len(match_vals) > 0:
+                    match_id_mapping[unique_id] = match_vals[0]
+            
+            # Extract target (rifle) from string metadata
+            rifle_value = string.get('rifle', '')
+            if rifle_value:
+                target_mapping[unique_id] = rifle_value
+    
+    # Populate relay, match_id, and target columns in df_scores based on uniq_id matches
+    if df_scores is not None and 'uniq_id' in df_scores.columns:
+        # Update relay column
+        if 'relay' in df_scores.columns:
+            df_scores['relay'] = df_scores['uniq_id'].map(relay_mapping).fillna('')
+        
+        # Update match_id column
+        if 'match_id' in df_scores.columns:
+            df_scores['match_id'] = df_scores['uniq_id'].map(match_id_mapping).fillna('')
+        
+        # Update target column (populated with rifle data)
+        if 'target' in df_scores.columns:
+            df_scores['target'] = df_scores['uniq_id'].map(target_mapping).fillna('')
+    
     # Store merged dataframes for display
     merged_dataframes = []
     
