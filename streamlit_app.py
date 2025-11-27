@@ -117,11 +117,34 @@ if uploaded_files:
         # Update target column (populated with rifle data)
         if 'target' in df_scores.columns:
             df_scores['target'] = df_scores['uniq_id'].map(target_mapping).fillna('')
+
+        # for any missing values in match_id, get the match column and look to see if its been matched to a match_id in another row and if so use that match_id
+        if 'match' in df_scores.columns:
+            for index, row in df_scores.iterrows():
+            if pd.isna(row['match_id']):
+                match_val = row['match']
+                if match_val in match_id_mapping:
+                    df_scores.at[index, 'match_id'] = match_id_mapping[match_val]
+
+        # for an missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
+        if 'user' in df_scores.columns:
+            for index, row in df_scores.iterrows():
+                if pd.isna(row['relay']):
+                    user_val = row['user']
+                    if user_val in relay_mapping:
+                        df_scores.at[index, 'relay'] = relay_mapping[user_val]
+                        df_scores.at[index, 'target'] = target_mapping[user_val]
+
+        
         
         # Display updated df_scores after population
         st.subheader("Updated Scores Data (After Merging)")
         st.write(f"Updated {len(df_scores)} rows with relay, match_id, and target data")
         st.dataframe(df_scores, use_container_width=True)
+
+        
+        
+
     
     # Store merged dataframes for display
     merged_dataframes = []
