@@ -212,79 +212,102 @@ if uploaded_files:
             )
             string['data'] = df_combined
 
-            #display the df_combined datafram to inspect
-            st.subheader("Merged Data (Shotmarker + Scores)")
-            st.dataframe(df_combined, use_container_width=True)
+        
     
-    # Display merged dataframes under scores section
-    # if merged_dataframes and scores_uploaded_file:
-    #     st.subheader("Merged Data (Shotmarker + Scores)")
-    #     for merged_info in merged_dataframes:
-    #         st.write(f"**Unique ID:** {merged_info['unique_id']} | **Shooter:** {merged_info['shooter']}")
-    #         st.dataframe(merged_info['data'], use_container_width=True)
-    #         st.divider()
-
-
+    # ============================================================================
+    # STEP 4: Group strings by user, relay (from scores), and target
+    # ============================================================================
+    def get_grouping_key(string):
+        """
+        Get the grouping key (user, relay, target) for a string.
+        Returns a tuple: (user, relay, target)
+        """
+        unique_id = string.get('unique_id', '')
+        
+        # Get values from scores lookup if available
+        user_val = string.get('shooter', 'Unknown')  # Already updated from scores
+        relay_val = ''
+        target_val = string.get('rifle', '')  # Default to rifle from shotmarker
+        
+        if unique_id and unique_id in scores_lookup:
+            scores_row = scores_lookup[unique_id]
+            # Get relay from scores (prefer scores over shotmarker)
+            relay_val = scores_row.get('relay', '') or ''
+            # Get target from scores if available, otherwise use rifle
+            target_val = scores_row.get('target', '') or string.get('rifle', '')
+        
+        # Normalize empty values
+        user_val = user_val or 'Unknown'
+        relay_val = relay_val or ''
+        target_val = target_val or ''
+        
+        return (user_val, relay_val, target_val)
     
-    # Group strings by shooter name and sort by match
-    
-    # Group by shooter name
-    strings_by_shooter = {}
+    # Group strings by (user, relay, target)
+    strings_by_group = {}
     for string in all_strings:
-        shooter = string.get('shooter', 'Unknown')
-        if shooter not in strings_by_shooter:
-            strings_by_shooter[shooter] = []
-        strings_by_shooter[shooter].append(string)
+        group_key = get_grouping_key(string)
+        if group_key not in strings_by_group:
+            strings_by_group[group_key] = []
+        strings_by_group[group_key].append(string)
     
-    # Sort each shooter's strings by match number
-    for shooter in strings_by_shooter:
-        strings_by_shooter[shooter].sort(key=get_match_number)
+    # Sort strings within each group by match number
+    for group_key in strings_by_group:
+        strings_by_group[group_key].sort(key=get_match_number)
     
-    # Sort shooters alphabetically
-    sorted_shooters = sorted(strings_by_shooter.keys())
+    # Sort groups: first by user, then by relay, then by target
+    sorted_groups = sorted(strings_by_group.keys(), key=lambda x: (x[0], x[1] or '', x[2] or ''))
     
-    # Add dropdown to select shooter in sidebar
-    if len(sorted_shooters) > 0:
-        # Add "All Shooters" option at the beginning
-        shooter_options = ["All Shooters"] + sorted_shooters
-        selected_shooter = st.sidebar.selectbox(
-            "Select Shooter:",
-            options=shooter_options,
+    # Add dropdown to select group in sidebar
+    if len(sorted_groups) > 0:
+        # Create display labels for groups
+        group_labels = []
+        for user, relay, target in sorted_groups:
+            parts = [f"User: {user}"]
+            if relay:
+                parts.append(f"Relay: {relay}")
+            if target:
+                parts.append(f"Target: {target}")
+            label = " | ".join(parts)
+            group_labels.append(label)
+        
+        # Add "All Groups" option at the beginning
+        group_options = ["All Groups"] + group_labels
+        selected_group_label = st.sidebar.selectbox(
+            "Select Group:",
+            options=group_options,
             index=0,
-            key="shooter_selector"
+            key="group_selector"
         )
         
-        # Filter shooters based on selection
-        if selected_shooter == "All Shooters":
-            shooters_to_display = sorted_shooters
+        # Filter groups based on selection
+        if selected_group_label == "All Groups":
+            groups_to_display = sorted_groups
         else:
-            shooters_to_display = [selected_shooter]
+            # Find the index of selected label
+            selected_idx = group_labels.index(selected_group_label)
+            groups_to_display = [sorted_groups[selected_idx]]
     else:
-        shooters_to_display = []
+        groups_to_display = []
     
-    # Display grouped by shooter
-    for shooter in shooters_to_display:
-        strings = strings_by_shooter[shooter]
+    # Display grouped by (user, relay, target)
+    for group_key in groups_to_display:
+        user, relay, target = group_key
+        strings = strings_by_group[group_key]
         
-        # Create container for each shooter
+        # Create container for each group
         with st.container():
-            st.header(f"Shooter: {shooter}")
+            # Build header with group information
+            header_parts = [f"User: {user}"]
+            if relay:
+                header_parts.append(f"Relay: {relay}")
+            if target:
+                header_parts.append(f"Target: {target}")
+            st.header(" | ".join(header_parts))
+            
             if strings:
                 first_string = strings[0]
-                # Get relay from df_scores if available
-                relay_value = ''
-                if df_scores is not None and 'uniq_id' in df_scores.columns and 'relay' in df_scores.columns:
-                    unique_id = first_string.get('unique_id', '')
-                    if unique_id:
-                        matching_rows = df_scores[df_scores['uniq_id'] == unique_id]
-                        if not matching_rows.empty:
-                            relay_value = matching_rows.iloc[0]['relay']
-                            if pd.isna(relay_value) or relay_value == '':
-                                relay_value = ''
-                            else:
-                                relay_value = f" | Relay: {relay_value}"
-                
-                st.subheader(f"Date: {first_string['date']} | Target: {first_string['rifle']}{relay_value}")
+                st.subheader(f"Date: {first_string['date']}")
                 
             # Create shooter report and download button
             # report_buf = create_shooter_report(shooter, strings, get_match_number)
@@ -300,24 +323,22 @@ if uploaded_files:
             
             st.divider()
             
-            # Display all strings for this shooter inside the container
+            # Display each match string separately within this group
             for i, string in enumerate(strings):
                 # Get match number for display
                 match_num = get_match_number(string)
                 match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
                 
-                # Get match value from df_scores if available
+                # Get match value from scores lookup if available
                 match_value = ''
-                if df_scores is not None and 'uniq_id' in df_scores.columns and 'match' in df_scores.columns:
-                    unique_id = string.get('unique_id', '')
-                    if unique_id:
-                        matching_rows = df_scores[df_scores['uniq_id'] == unique_id]
-                        if not matching_rows.empty:
-                            match_val = matching_rows.iloc[0]['match']
-                            if not pd.isna(match_val) and match_val != '':
-                                match_value = f"Match: {match_val}, "
+                unique_id = string.get('unique_id', '')
+                if unique_id and unique_id in scores_lookup:
+                    match_val = scores_lookup[unique_id].get('match', '')
+                    if match_val and not pd.isna(match_val) and match_val != '':
+                        match_value = f"Match: {match_val}, "
                 
-                #st.subheader(f"{match_display} - {string['stage']}")
+                # Display match header
+                st.subheader(f"{match_display} - {string['stage']}")
                 st.write(f"{match_value}Target Type: {string['course']}, Score: {string['score']}")
                 
                 df = string['data']
@@ -351,9 +372,14 @@ if uploaded_files:
                     st.dataframe(summary_df_t, width='content', hide_index=False)
 
                     # Show raw data toggle
-                    if st.checkbox(f"Show Raw Data for {match_display}", key=f"raw_data_{shooter}_{i}"):
+                    group_key_str = f"{user}_{relay}_{target}".replace(' ', '_')
+                    if st.checkbox(f"Show Raw Data for {match_display}", key=f"raw_data_{group_key_str}_{i}"):
                         st.subheader(f"Raw Data for {match_display}")
                         st.write(df)
+                
+                # Add divider between match strings (except after the last one)
+                if i < len(strings) - 1:
+                    st.divider()
                 
                 # do not close the figure here because it's used below for the download button
                 # Optionally, provide download link for the plot
