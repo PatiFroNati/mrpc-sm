@@ -377,9 +377,8 @@ if uploaded_files:
                         st.subheader(f"Raw Data for {match_display}")
                         st.write(df)
                 
-                # Add divider between match strings (except after the last one)
-                if i < len(strings) - 1:
-                    st.divider()
+               
+                    
                 
                 # do not close the figure here because it's used below for the download button
                 # Optionally, provide download link for the plot
@@ -395,5 +394,6 @@ if uploaded_files:
                 # buf.close()
             
             # Add spacing between shooter containers
+            st.divider()
             st.markdown("<br>", unsafe_allow_html=True)
             
