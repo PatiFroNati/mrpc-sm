@@ -7,6 +7,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
 import os
 import io
+import re
 from PIL import Image
 
 from shotmarker_parser import parse_shotmarker_csv
@@ -34,12 +35,27 @@ scores_uploaded_file = st.file_uploader(
 )
 
 # Process scores CSV file if uploaded (display above shot strings)
+df_scores = None
+shooter_name_mapping = {}
 if scores_uploaded_file:
     st.header("Scores Data")
     try:
         df_scores = parse_scores_csv(scores_uploaded_file)
         st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
         st.dataframe(df_scores, use_container_width=True)
+        
+        # Create mapping from uniq_id to shooter name
+        # Try common column names for shooter name
+        shooter_col = None
+        for col_name in ['shooter', 'name', 'shooter_name', 'Name', 'Shooter', 'Shooter Name']:
+            if col_name in df_scores.columns:
+                shooter_col = col_name
+                break
+        
+        if shooter_col:
+            shooter_name_mapping = dict(zip(df_scores['uniq_id'], df_scores[shooter_col]))
+        else:
+            st.warning("Could not find shooter name column in scores CSV. Available columns: " + ", ".join(df_scores.columns))
         
         # Optionally show raw data toggle
         if st.checkbox("Show Raw Data Info", key="scores_raw_data"):
@@ -50,12 +66,68 @@ if scores_uploaded_file:
         st.error(f"Error processing scores CSV file: {str(e)}")
 
 if uploaded_files:
+    # Collect all strings from all uploaded files
+    all_strings = []
     for uploaded_file in uploaded_files:
-        # st.header(f"File: {uploaded_file.name}")
         strings = parse_shotmarker_csv(uploaded_file)
+        all_strings.extend(strings)
+    
+    # Update shooter names from scores CSV if available
+    if shooter_name_mapping:
+        for string in all_strings:
+            unique_id = string.get('unique_id', '')
+            if unique_id in shooter_name_mapping:
+                string['shooter'] = shooter_name_mapping[unique_id]
+                # Also update shooter_name in the DataFrame if it exists
+                if 'data' in string and 'shooter_name' in string['data'].columns:
+                    string['data']['shooter_name'] = shooter_name_mapping[unique_id]
+    
+    # Group strings by shooter name and sort by match
+    # Extract match number for sorting (convert to int if possible)
+    def get_match_number(string):
+        match_val = None
+        if 'data' in string and 'match' in string['data'].columns:
+            # Get the first match value from the DataFrame (all rows should have the same match)
+            match_vals = string['data']['match'].dropna().unique()
+            if len(match_vals) > 0:
+                match_val = match_vals[0]
+        
+        if match_val is None:
+            # Try to extract from shooter_stage
+            shooter_stage = string.get('shooter_stage', '')
+            match_match = re.search(r'[Mm](\d+)', shooter_stage)
+            match_val = match_match.group(1) if match_match else None
+        
+        try:
+            return int(match_val) if match_val else 999
+        except (ValueError, TypeError):
+            return 999
+    
+    # Group by shooter name
+    strings_by_shooter = {}
+    for string in all_strings:
+        shooter = string.get('shooter', 'Unknown')
+        if shooter not in strings_by_shooter:
+            strings_by_shooter[shooter] = []
+        strings_by_shooter[shooter].append(string)
+    
+    # Sort each shooter's strings by match number
+    for shooter in strings_by_shooter:
+        strings_by_shooter[shooter].sort(key=get_match_number)
+    
+    # Sort shooters alphabetically
+    sorted_shooters = sorted(strings_by_shooter.keys())
+    
+    # Display grouped by shooter
+    for shooter in sorted_shooters:
+        st.header(f"Shooter: {shooter}")
+        strings = strings_by_shooter[shooter]
         
         for i, string in enumerate(strings):
-            st.subheader(f"Shooting String {i+1}: {string['shooter']} - {string['stage']}")
+            # Get match number for display
+            match_num = get_match_number(string)
+            match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
+            st.subheader(f"{match_display} - {string['stage']}")
             st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}, Unique ID: {string['unique_id']}")
             
             df = string['data']
@@ -109,8 +181,8 @@ if uploaded_files:
                 st.dataframe(summary_df_t, width='content', hide_index=False)
 
                 # Show raw data toggle
-                if st.checkbox(f"Show Raw Data for String {i+1}", key=f"raw_data_{i}"):
-                    st.subheader(f"Raw Data for String {i+1}")
+                if st.checkbox(f"Show Raw Data for {match_display}", key=f"raw_data_{shooter}_{i}"):
+                    st.subheader(f"Raw Data for {match_display}")
                     st.write(df)
             
             # do not close the figure here because it's used below for the download button
@@ -121,7 +193,7 @@ if uploaded_files:
             st.download_button(
                 label="Download Target Plot as PNG",
                 data=buf,
-                file_name=f"target_plot_string_{i+1}.png",
+                file_name=f"target_plot_{shooter}_match_{match_num}_string_{i+1}.png",
                 mime="image/png"
             )
             buf.close()
