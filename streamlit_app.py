@@ -295,8 +295,20 @@ if uploaded_files:
                 # Get match number for display
                 match_num = get_match_number(string)
                 match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
+                
+                # Get match value from df_scores if available
+                match_value = ''
+                if df_scores is not None and 'uniq_id' in df_scores.columns and 'match' in df_scores.columns:
+                    unique_id = string.get('unique_id', '')
+                    if unique_id:
+                        matching_rows = df_scores[df_scores['uniq_id'] == unique_id]
+                        if not matching_rows.empty:
+                            match_val = matching_rows.iloc[0]['match']
+                            if not pd.isna(match_val) and match_val != '':
+                                match_value = f"Match: {match_val}, "
+                
                 #st.subheader(f"{match_display} - {string['stage']}")
-                st.write(f"Target Type: {string['course']}, Score: {string['score']}")
+                st.write(f"{match_value}Target Type: {string['course']}, Score: {string['score']}")
                 
                 df = string['data']
                 summary_data = {
