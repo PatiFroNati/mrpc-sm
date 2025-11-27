@@ -44,17 +44,19 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                 if current_string and current_data:
                     current_string["data"] = pd.DataFrame(current_data)
                     # Add relay, match, and shooter_name columns
+                    # Use shooter_stage (original full string) for relay/match extraction
+                    shooter_stage_text = current_string.get("shooter_stage", "")
                     shooter_text = current_string.get("shooter", "")
                     rifle_text = current_string.get("rifle", "")
                     
                     # Extract relay (R followed by number, case-insensitive, anywhere in string)
                     # Pattern: R or r followed immediately by one or more digits
-                    relay_match = re.search(r'[Rr](\d+)', shooter_text)
+                    relay_match = re.search(r'[Rr](\d+)', shooter_stage_text)
                     relay = relay_match.group(1) if relay_match else None
                     
                     # Extract match (M followed by number, case-insensitive, anywhere in string)
                     # Pattern: M or m followed immediately by one or more digits
-                    match_match = re.search(r'[Mm](\d+)', shooter_text)
+                    match_match = re.search(r'[Mm](\d+)', shooter_stage_text)
                     match = match_match.group(1) if match_match else None
                     
                     # Extract first word of shooter and concatenate with rifle
@@ -88,6 +90,7 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                     "date": parts[0],
                     "shooter": shooter or "Unknown",
                     "stage": stage or "",
+                    "shooter_stage": shooter_stage,  # Store original for relay/match extraction
                     "rifle": rifle,
                     "target_info": parts[3] if len(parts) > 3 else "",
                     "course": parts[4] if len(parts) > 4 else "",
@@ -127,17 +130,19 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
     if current_string and current_data:
         current_string["data"] = pd.DataFrame(current_data)
         # Add relay, match, and shooter_name columns
+        # Use shooter_stage (original full string) for relay/match extraction
+        shooter_stage_text = current_string.get("shooter_stage", "")
         shooter_text = current_string.get("shooter", "")
         rifle_text = current_string.get("rifle", "")
         
         # Extract relay (R followed by number, case-insensitive, anywhere in string)
         # Pattern: R or r followed immediately by one or more digits
-        relay_match = re.search(r'[Rr](\d+)', shooter_text)
+        relay_match = re.search(r'[Rr](\d+)', shooter_stage_text)
         relay = relay_match.group(1) if relay_match else None
         
         # Extract match (M followed by number, case-insensitive, anywhere in string)
         # Pattern: M or m followed immediately by one or more digits
-        match_match = re.search(r'[Mm](\d+)', shooter_text)
+        match_match = re.search(r'[Mm](\d+)', shooter_stage_text)
         match = match_match.group(1) if match_match else None
         
         # Extract first word of shooter and concatenate with rifle
