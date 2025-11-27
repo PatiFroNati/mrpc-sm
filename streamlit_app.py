@@ -39,6 +39,15 @@ if scores_uploaded_file:
     st.header("Scores Data")
     try:
         df_scores = parse_scores_csv(scores_uploaded_file)
+        
+        # Add relay, match, and target columns if they don't exist
+        if 'relay' not in df_scores.columns:
+            df_scores['relay'] = ''
+        if 'match' not in df_scores.columns:
+            df_scores['match'] = ''
+        if 'target' not in df_scores.columns:
+            df_scores['target'] = ''
+        
         st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
         st.dataframe(df_scores, use_container_width=True)
         
@@ -87,6 +96,7 @@ if uploaded_files:
                 # Update shooter_name in the DataFrame if it exists
                 if 'data' in string and 'shooter_name' in string['data'].columns:
                     string['data']['shooter_name'] = new_shooter_name
+
     
     # Group strings by shooter name and sort by match
     
