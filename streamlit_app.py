@@ -187,8 +187,27 @@ if uploaded_files:
     # Sort shooters alphabetically
     sorted_shooters = sorted(strings_by_shooter.keys())
     
+    # Add dropdown to select shooter
+    if len(sorted_shooters) > 0:
+        # Add "All Shooters" option at the beginning
+        shooter_options = ["All Shooters"] + sorted_shooters
+        selected_shooter = st.selectbox(
+            "Select Shooter:",
+            options=shooter_options,
+            index=0,
+            key="shooter_selector"
+        )
+        
+        # Filter shooters based on selection
+        if selected_shooter == "All Shooters":
+            shooters_to_display = sorted_shooters
+        else:
+            shooters_to_display = [selected_shooter]
+    else:
+        shooters_to_display = []
+    
     # Display grouped by shooter
-    for shooter in sorted_shooters:
+    for shooter in shooters_to_display:
         strings = strings_by_shooter[shooter]
         
         # Create container for each shooter
