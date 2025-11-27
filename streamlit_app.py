@@ -121,19 +121,19 @@ if uploaded_files:
         # for any missing values in match_id, get the match column and look to see if its been matched to a match_id in another row and if so use that match_id
         if 'match' in df_scores.columns:
             for index, row in df_scores.iterrows():
-            if pd.isna(row['match_id']):
-                match_val = row['match']
-                if match_val in match_id_mapping:
-                    df_scores.at[index, 'match_id'] = match_id_mapping[match_val]
+                if pd.isna(row['match_id']) or row['match_id'] == '':
+                    match_val = row['match']
+                    if match_val in match_id_mapping:
+                        df_scores.at[index, 'match_id'] = match_id_mapping[match_val]
 
-        # for an missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
+        # for any missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
         if 'user' in df_scores.columns:
             for index, row in df_scores.iterrows():
-            if pd.isna(row['relay']) and pd.isna(row['target']):
-                user_val = row['user']
-                if user_val in relay_mapping:
-                    df_scores.at[index, 'relay'] = relay_mapping[user_val]
-                    df_scores.at[index, 'target'] = target_mapping[user_val]
+                if (pd.isna(row['relay']) or row['relay'] == '') and (pd.isna(row['target']) or row['target'] == ''):
+                    user_val = row['user']
+                    if user_val in relay_mapping:
+                        df_scores.at[index, 'relay'] = relay_mapping[user_val]
+                        df_scores.at[index, 'target'] = target_mapping[user_val]
 
         
         
