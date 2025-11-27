@@ -99,10 +99,10 @@ if uploaded_files:
 
                     #create a new dataframe that outer joins the shotmarker data with the scores data
                     df_shotmarker = string['data']
-                    df_scores_filtered = df_scores[df_scores['uniq_id'] == unique_id]
-                    df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='uniq_id', how='outer')
+                    df_scores_filtered = df_scores[df_scores['unique_id'] == unique_id]
+                    df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='unique_id', how='outer')
                     string['data'] = df_combined
-                    
+
 
     
     # Group strings by shooter name and sort by match
