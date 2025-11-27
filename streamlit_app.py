@@ -298,7 +298,7 @@ if uploaded_files:
         # Create container for each group
         with st.container():
             # Build header with group information
-            header_parts = [f"User: {user}"]
+            header_parts = [f"{user}"]
             if relay:
                 header_parts.append(f"Relay: {relay}")
             if target:
