@@ -122,12 +122,12 @@ if uploaded_files:
                         })
     
     # Display merged dataframes under scores section
-    if merged_dataframes and scores_uploaded_file:
-        st.subheader("Merged Data (Shotmarker + Scores)")
-        for merged_info in merged_dataframes:
-            st.write(f"**Unique ID:** {merged_info['unique_id']} | **Shooter:** {merged_info['shooter']}")
-            st.dataframe(merged_info['data'], use_container_width=True)
-            st.divider()
+    # if merged_dataframes and scores_uploaded_file:
+    #     st.subheader("Merged Data (Shotmarker + Scores)")
+    #     for merged_info in merged_dataframes:
+    #         st.write(f"**Unique ID:** {merged_info['unique_id']} | **Shooter:** {merged_info['shooter']}")
+    #         st.dataframe(merged_info['data'], use_container_width=True)
+    #         st.divider()
 
 
     
