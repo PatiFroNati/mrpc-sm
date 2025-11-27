@@ -198,7 +198,7 @@ if uploaded_files:
                 match_num = get_match_number(string)
                 match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
                 #st.subheader(f"{match_display} - {string['stage']}")
-                st.write(f"Target Type: {string['course']}, Match: {string['match']}, Score: {string['score']}")
+                st.write(f"Target Type: {string['course']}, Match: {string['match_num']}, Score: {string['score']}")
                 
                 df = string['data']
                 summary_data = {
