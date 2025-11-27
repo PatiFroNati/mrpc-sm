@@ -261,7 +261,20 @@ if uploaded_files:
             st.header(f"Shooter: {shooter}")
             if strings:
                 first_string = strings[0]
-                st.subheader(f"Date: {first_string['date']} | Target: {first_string['rifle']}")
+                # Get relay from df_scores if available
+                relay_value = ''
+                if df_scores is not None and 'uniq_id' in df_scores.columns and 'relay' in df_scores.columns:
+                    unique_id = first_string.get('unique_id', '')
+                    if unique_id:
+                        matching_rows = df_scores[df_scores['uniq_id'] == unique_id]
+                        if not matching_rows.empty:
+                            relay_value = matching_rows.iloc[0]['relay']
+                            if pd.isna(relay_value) or relay_value == '':
+                                relay_value = ''
+                            else:
+                                relay_value = f" | Relay: {relay_value}"
+                
+                st.subheader(f"Date: {first_string['date']} | Target: {first_string['rifle']}{relay_value}")
                 
             # Create shooter report and download button
             # report_buf = create_shooter_report(shooter, strings, get_match_number)
