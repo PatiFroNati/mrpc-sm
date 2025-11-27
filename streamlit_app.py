@@ -118,13 +118,18 @@ if uploaded_files:
         if 'target' in df_scores.columns:
             df_scores['target'] = df_scores['uniq_id'].map(target_mapping).fillna('')
 
-        # for any missing values in match_id, get the match column and look to see if its been matched to a match_id in another row and if so use that match_id
-        if 'match' in df_scores.columns:
-            for index, row in df_scores.iterrows():
-                if pd.isna(row['match_id']) or row['match_id'] == '':
-                    match_val = row['match']
-                    if match_val in match_id_mapping:
-                        df_scores.at[index, 'match_id'] = match_id_mapping[match_val]
+        # for any missing values in match_id, find the first non-null value for each match and fill all null values in that match group
+        if 'match' in df_scores.columns and 'match_id' in df_scores.columns:
+            # Replace empty strings with NaN for easier handling
+            df_scores['match_id'] = df_scores['match_id'].replace('', pd.NA)
+            
+            # Group by match and fill missing match_id values with the first non-null value in each group
+            df_scores['match_id'] = df_scores.groupby('match')['match_id'].transform(
+                lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
+            )
+            
+            # Replace NaN back to empty string if needed
+            df_scores['match_id'] = df_scores['match_id'].fillna('')
 
         # for any missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
         if 'user' in df_scores.columns:
