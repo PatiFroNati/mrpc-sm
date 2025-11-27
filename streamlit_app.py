@@ -131,14 +131,27 @@ if uploaded_files:
             # Replace NaN back to empty string if needed
             df_scores['match_id'] = df_scores['match_id'].fillna('')
 
-        # for any missing values in relay, get the user, look to see if its been matched to a relay in another row and if so use that relay to fill in the missing relay value, go ahead and fill in the target value for that same row also
+        # for any missing values in relay and target, find the first non-null value for each user and fill all null values for that user
         if 'user' in df_scores.columns:
-            for index, row in df_scores.iterrows():
-                if (pd.isna(row['relay']) or row['relay'] == '') and (pd.isna(row['target']) or row['target'] == ''):
-                    user_val = row['user']
-                    if user_val in relay_mapping:
-                        df_scores.at[index, 'relay'] = relay_mapping[user_val]
-                        df_scores.at[index, 'target'] = target_mapping[user_val]
+            # Replace empty strings with NaN for easier handling
+            df_scores['relay'] = df_scores['relay'].replace('', pd.NA)
+            df_scores['target'] = df_scores['target'].replace('', pd.NA)
+            
+            # Group by user and fill missing relay values with the first non-null value in each group
+            if 'relay' in df_scores.columns:
+                df_scores['relay'] = df_scores.groupby('user')['relay'].transform(
+                    lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
+                )
+            
+            # Group by user and fill missing target values with the first non-null value in each group
+            if 'target' in df_scores.columns:
+                df_scores['target'] = df_scores.groupby('user')['target'].transform(
+                    lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
+                )
+            
+            # Replace NaN back to empty string if needed
+            df_scores['relay'] = df_scores['relay'].fillna('')
+            df_scores['target'] = df_scores['target'].fillna('')
 
         
         
