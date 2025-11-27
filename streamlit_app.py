@@ -117,6 +117,11 @@ if uploaded_files:
         # Update target column (populated with rifle data)
         if 'target' in df_scores.columns:
             df_scores['target'] = df_scores['uniq_id'].map(target_mapping).fillna('')
+        
+        # Display updated df_scores after population
+        st.subheader("Updated Scores Data (After Merging)")
+        st.write(f"Updated {len(df_scores)} rows with relay, match_id, and target data")
+        st.dataframe(df_scores, use_container_width=True)
     
     # Store merged dataframes for display
     merged_dataframes = []
