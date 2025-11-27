@@ -56,11 +56,16 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                     shooter = tokens[0]
                     stage = " ".join(tokens[1:]) if len(tokens) > 1 else ""
 
+                # Extract rifle text between parentheses
+                rifle_text = parts[2] if len(parts) > 2 else ""
+                rifle_match = re.search(r'\(([^)]+)\)', rifle_text)
+                rifle = rifle_match.group(1) if rifle_match else rifle_text
+                
                 current_string = {
                     "date": parts[0],
                     "shooter": shooter or "Unknown",
                     "stage": stage or "",
-                    "rifle": parts[2] if len(parts) > 2 else "",
+                    "rifle": rifle,
                     "target_info": parts[3] if len(parts) > 3 else "",
                     "course": parts[4] if len(parts) > 4 else "",
                     "score": parts[5] if len(parts) > 5 else "",
