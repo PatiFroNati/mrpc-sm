@@ -48,11 +48,11 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
                     rifle_text = current_string.get("rifle", "")
                     
                     # Extract relay (R followed by number, case-insensitive, anywhere in string)
-                    relay_match = re.search(r'r(\d+)', shooter_text, re.IGNORECASE)
+                    relay_match = re.search(r'(?i)r(\d+)', shooter_text)
                     relay = relay_match.group(1) if relay_match else None
                     
                     # Extract match (M followed by number, case-insensitive, anywhere in string)
-                    match_match = re.search(r'm(\d+)', shooter_text, re.IGNORECASE)
+                    match_match = re.search(r'(?i)m(\d+)', shooter_text)
                     match = match_match.group(1) if match_match else None
                     
                     # Extract first word of shooter and concatenate with rifle
@@ -129,11 +129,11 @@ def parse_shotmarker_csv(uploaded_file: Union[bytes, str, "UploadedFile"]) -> Li
         rifle_text = current_string.get("rifle", "")
         
         # Extract relay (R followed by number, case-insensitive, anywhere in string)
-        relay_match = re.search(r'r(\d+)', shooter_text, re.IGNORECASE)
+        relay_match = re.search(r'(?i)r(\d+)', shooter_text)
         relay = relay_match.group(1) if relay_match else None
         
         # Extract match (M followed by number, case-insensitive, anywhere in string)
-        match_match = re.search(r'm(\d+)', shooter_text, re.IGNORECASE)
+        match_match = re.search(r'(?i)m(\d+)', shooter_text)
         match = match_match.group(1) if match_match else None
         
         # Extract first word of shooter and concatenate with rifle
