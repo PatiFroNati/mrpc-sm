@@ -79,6 +79,9 @@ if uploaded_files:
         strings = parse_shotmarker_csv(uploaded_file)
         all_strings.extend(strings)
     
+    # Store merged dataframes for display
+    merged_dataframes = []
+    
     # Update shooter names from scores CSV if available
     # If unique_id matches, replace shooter_name with user from scores CSV + rifle from shotmarker data
     if user_mapping:
@@ -111,6 +114,20 @@ if uploaded_files:
                         df_scores_filtered = df_scores_filtered.rename(columns={'uniq_id': 'unique_id'})
                         df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='unique_id', how='outer', suffixes=('', '_scores'))
                         string['data'] = df_combined
+                        # Store for display
+                        merged_dataframes.append({
+                            'unique_id': unique_id,
+                            'shooter': string.get('shooter', 'Unknown'),
+                            'data': df_combined
+                        })
+    
+    # Display merged dataframes under scores section
+    if merged_dataframes and scores_uploaded_file:
+        st.subheader("Merged Data (Shotmarker + Scores)")
+        for merged_info in merged_dataframes:
+            st.write(f"**Unique ID:** {merged_info['unique_id']} | **Shooter:** {merged_info['shooter']}")
+            st.dataframe(merged_info['data'], use_container_width=True)
+            st.divider()
 
 
     
