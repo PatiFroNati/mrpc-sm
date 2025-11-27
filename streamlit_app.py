@@ -96,12 +96,21 @@ if uploaded_files:
                 # Update shooter_name in the DataFrame if it exists
                 if 'data' in string and 'shooter_name' in string['data'].columns:
                     string['data']['shooter_name'] = new_shooter_name
-
-                    #create a new dataframe that outer joins the shotmarker data with the scores data
-                    df_shotmarker = string['data']
-                    df_scores_filtered = df_scores[df_scores['uniq_id'] == unique_id]
-                    df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='uniq_id', how='outer')
-                    string['data'] = df_combined
+                
+                # Create a new dataframe that outer joins the shotmarker data with the scores data
+                if 'data' in string and df_scores is not None and 'uniq_id' in df_scores.columns:
+                    df_shotmarker = string['data'].copy()
+                    # Add unique_id to the shotmarker dataframe for merging
+                    df_shotmarker['unique_id'] = unique_id
+                    
+                    # Filter scores data for this unique_id
+                    df_scores_filtered = df_scores[df_scores['uniq_id'] == unique_id].copy()
+                    
+                    if not df_scores_filtered.empty:
+                        # Merge on unique_id/uniq_id (rename one to match)
+                        df_scores_filtered = df_scores_filtered.rename(columns={'uniq_id': 'unique_id'})
+                        df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='unique_id', how='outer', suffixes=('', '_scores'))
+                        string['data'] = df_combined
 
 
     
