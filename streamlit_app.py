@@ -176,7 +176,7 @@ if uploaded_files:
             st.header(f"Shooter: {shooter}")
             if strings:
                 first_string = strings[0]
-                st.subheader(f"Date: {first_string['date']} | Rifle: {first_string['rifle']} | Relay: {first_string['relay']}")
+                st.subheader(f"Date: {first_string['date']} | Target: {first_string['rifle']}")
                 
             # Create shooter report and download button
             # report_buf = create_shooter_report(shooter, strings, get_match_number)
