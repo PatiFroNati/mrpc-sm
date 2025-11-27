@@ -43,8 +43,8 @@ if scores_uploaded_file:
         # Add relay, match, and target columns if they don't exist
         if 'relay' not in df_scores.columns:
             df_scores['relay'] = ''
-        if 'match' not in df_scores.columns:
-            df_scores['match'] = ''
+        if 'match_id' not in df_scores.columns:
+            df_scores['match_id'] = ''
         if 'target' not in df_scores.columns:
             df_scores['target'] = ''
         
