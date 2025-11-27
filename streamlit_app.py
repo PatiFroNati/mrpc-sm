@@ -133,16 +133,16 @@ if uploaded_files:
             st.header(f"Shooter: {shooter}")
             
             # Create shooter report and download button
-            report_buf = create_shooter_report(shooter, strings, get_match_number)
-            if report_buf:
-                st.download_button(
-                    label=f"📥 Download {shooter} Report (PNG)",
-                    data=report_buf,
-                    file_name=f"shooter_report_{shooter.replace(' ', '_')}.png",
-                    mime="image/png",
-                    key=f"download_report_{shooter}"
-                )
-                report_buf.close()
+            # report_buf = create_shooter_report(shooter, strings, get_match_number)
+            # if report_buf:
+            #     st.download_button(
+            #         label=f"📥 Download {shooter} Report (PNG)",
+            #         data=report_buf,
+            #         file_name=f"shooter_report_{shooter.replace(' ', '_')}.png",
+            #         mime="image/png",
+            #         key=f"download_report_{shooter}"
+            #     )
+            #     report_buf.close()
             
             st.divider()
             
@@ -151,8 +151,8 @@ if uploaded_files:
                 # Get match number for display
                 match_num = get_match_number(string)
                 match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
-                st.subheader(f"{match_display} - {string['stage']}")
-                st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}, Unique ID: {string['unique_id']}")
+                #st.subheader(f"{match_display} - {string['stage']}")
+                st.write(f"Date: {string['date']}, Target: {string['rifle']}, Target Type: {string['course']}, Score: {string['score']}")
                 
                 df = string['data']
                 summary_data = {
@@ -191,16 +191,16 @@ if uploaded_files:
                 
                 # do not close the figure here because it's used below for the download button
                 # Optionally, provide download link for the plot
-                buf = io.BytesIO()
-                fig.savefig(buf, format='png')
-                buf.seek(0)
-                st.download_button(
-                    label="Download Target Plot as PNG",
-                    data=buf,
-                    file_name=f"target_plot_{shooter}_match_{match_num}_string_{i+1}.png",
-                    mime="image/png"
-                )
-                buf.close()
+                # buf = io.BytesIO()
+                # fig.savefig(buf, format='png')
+                # buf.seek(0)
+                # st.download_button(
+                #     label="Download Target Plot as PNG",
+                #     data=buf,
+                #     file_name=f"target_plot_{shooter}_match_{match_num}_string_{i+1}.png",
+                #     mime="image/png"
+                # )
+                # buf.close()
             
             # Add spacing between shooter containers
             st.markdown("<br>", unsafe_allow_html=True)
