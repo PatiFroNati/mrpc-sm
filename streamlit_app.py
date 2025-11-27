@@ -23,12 +23,12 @@ st.write(
 # optional CSS to ensure the block container uses full width
 st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max-width:100%;}</style>", unsafe_allow_html=True)
 
-uploaded_files = st.file_uploader(
+uploaded_files = st.sidebar.file_uploader(
     "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv", "xlsx"]
 )
 
 # Second upload button for scores CSV
-scores_uploaded_file = st.file_uploader(
+scores_uploaded_file = st.sidebar.file_uploader(
     "Choose scores CSV file", accept_multiple_files=False, type=["csv"]
 )
 
