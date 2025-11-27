@@ -11,6 +11,7 @@ from PIL import Image
 
 from shotmarker_parser import parse_shotmarker_csv
 from plot_target import plot_target_with_scores
+from score_parser import parse_scores_csv
 
 # Must be the first Streamlit call in the file (move this right after `import streamlit as st`)
 st.set_page_config(page_title="MRPC Shotmarker Data Explorer", layout="wide")
@@ -25,6 +26,11 @@ st.markdown("<style>div.block-container{padding-left:1rem;padding-right:1rem;max
 
 uploaded_files = st.file_uploader(
     "Choose MRPC shotmarker data files", accept_multiple_files=True, type=["csv", "xlsx"]
+)
+
+# Second upload button for scores CSV
+scores_uploaded_file = st.file_uploader(
+    "Choose scores CSV file", accept_multiple_files=False, type=["csv"]
 )
 
 
@@ -107,8 +113,19 @@ if uploaded_files:
             )
             buf.close()
 
-            
-            
-
-
+# Process scores CSV file if uploaded
+if scores_uploaded_file:
+    st.header("Scores Data")
+    try:
+        df_scores = parse_scores_csv(scores_uploaded_file)
+        st.write(f"Loaded {len(df_scores)} rows from {scores_uploaded_file.name}")
+        st.dataframe(df_scores, use_container_width=True)
+        
+        # Optionally show raw data toggle
+        if st.checkbox("Show Raw Data Info", key="scores_raw_data"):
+            st.subheader("DataFrame Info")
+            st.write(f"Shape: {df_scores.shape}")
+            st.write(f"Columns: {list(df_scores.columns)}")
+    except Exception as e:
+        st.error(f"Error processing scores CSV file: {str(e)}")
             
