@@ -174,7 +174,10 @@ if uploaded_files:
         # Create container for each shooter
         with st.container():
             st.header(f"Shooter: {shooter}")
-            
+            if strings:
+                first_string = strings[0]
+                st.subheader(f"Date: {first_string['date']} | Rifle: {first_string['rifle']}")
+                
             # Create shooter report and download button
             # report_buf = create_shooter_report(shooter, strings, get_match_number)
             # if report_buf:
@@ -195,7 +198,7 @@ if uploaded_files:
                 match_num = get_match_number(string)
                 match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
                 #st.subheader(f"{match_display} - {string['stage']}")
-                st.write(f"Date: {string['date']}, Target: {string['rifle']}, Target Type: {string['course']}, Score: {string['score']}")
+                st.write(f"Target Type: {string['course']}, Match: {string['match']}, Score: {string['score']}")
                 
                 df = string['data']
                 summary_data = {
