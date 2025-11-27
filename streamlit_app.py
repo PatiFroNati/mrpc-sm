@@ -79,132 +79,138 @@ if uploaded_files:
         strings = parse_shotmarker_csv(uploaded_file)
         all_strings.extend(strings)
     
-    # Create mappings from unique_id to relay, match_id, and target (rifle) from all_strings
-    relay_mapping = {}
-    match_id_mapping = {}
-    target_mapping = {}
-    
+    # ============================================================================
+    # STEP 1: Create comprehensive mapping from shotmarker strings to metadata
+    # ============================================================================
+    # Build a single mapping dictionary with all metadata for each unique_id
+    # This is more efficient than creating separate mappings and extracting from DataFrames
+    shotmarker_metadata = {}
     for string in all_strings:
         unique_id = string.get('unique_id', '')
-        if unique_id:
-            # Extract relay from data DataFrame (all rows should have the same relay)
-            if 'data' in string and 'relay' in string['data'].columns:
+        if not unique_id:
+            continue
+        
+        # Extract relay and match from DataFrame (all rows have same values)
+        relay = None
+        match_id = None
+        if 'data' in string and string['data'] is not None:
+            if 'relay' in string['data'].columns:
                 relay_vals = string['data']['relay'].dropna().unique()
-                if len(relay_vals) > 0:
-                    relay_mapping[unique_id] = relay_vals[0]
-            
-            # Extract match from data DataFrame (all rows should have the same match)
-            if 'data' in string and 'match' in string['data'].columns:
+                relay = relay_vals[0] if len(relay_vals) > 0 else None
+            if 'match' in string['data'].columns:
                 match_vals = string['data']['match'].dropna().unique()
-                if len(match_vals) > 0:
-                    match_id_mapping[unique_id] = match_vals[0]
-            
-            # Extract target (rifle) from string metadata
-            rifle_value = string.get('rifle', '')
-            if rifle_value:
-                target_mapping[unique_id] = rifle_value
+                match_id = match_vals[0] if len(match_vals) > 0 else None
+        
+        shotmarker_metadata[unique_id] = {
+            'relay': relay,
+            'match_id': match_id,
+            'target': string.get('rifle', ''),
+            'shooter': string.get('shooter', ''),
+            'string_data': string  # Keep reference to full string for later merging
+        }
     
-    # Populate relay, match_id, and target columns in df_scores based on uniq_id matches
+    # ============================================================================
+    # STEP 2: Enrich scores DataFrame with shotmarker metadata
+    # ============================================================================
     if df_scores is not None and 'uniq_id' in df_scores.columns:
-        # Update relay column
-        if 'relay' in df_scores.columns:
-            df_scores['relay'] = df_scores['uniq_id'].map(relay_mapping).fillna('')
+        # Ensure required columns exist
+        for col in ['relay', 'match_id', 'target']:
+            if col not in df_scores.columns:
+                df_scores[col] = ''
         
-        # Update match_id column
-        if 'match_id' in df_scores.columns:
-            df_scores['match_id'] = df_scores['uniq_id'].map(match_id_mapping).fillna('')
+        # Map shotmarker metadata to scores DataFrame in one pass
+        def get_metadata_value(uniq_id, key):
+            """Helper to safely get metadata value"""
+            metadata = shotmarker_metadata.get(uniq_id, {})
+            return metadata.get(key, '')
         
-        # Update target column (populated with rifle data)
-        if 'target' in df_scores.columns:
-            df_scores['target'] = df_scores['uniq_id'].map(target_mapping).fillna('')
-
-        # for any missing values in match_id, find the first non-null value for each match and fill all null values in that match group
+        # Apply mappings efficiently
+        df_scores['relay'] = df_scores['uniq_id'].apply(lambda x: get_metadata_value(x, 'relay') or '')
+        df_scores['match_id'] = df_scores['uniq_id'].apply(lambda x: get_metadata_value(x, 'match_id') or '')
+        df_scores['target'] = df_scores['uniq_id'].apply(lambda x: get_metadata_value(x, 'target') or '')
+        
+        # Forward-fill missing values: match_id by match group, relay/target by user group
+        # Use pandas ffill/bfill which is more efficient than custom lambda functions
         if 'match' in df_scores.columns and 'match_id' in df_scores.columns:
-            # Replace empty strings with NaN for easier handling
+            # Replace empty strings with NaN for forward-fill
             df_scores['match_id'] = df_scores['match_id'].replace('', pd.NA)
-            
-            # Group by match and fill missing match_id values with the first non-null value in each group
-            df_scores['match_id'] = df_scores.groupby('match')['match_id'].transform(
-                lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
-            )
-            
-            # Replace NaN back to empty string if needed
+            # Forward-fill within each match group
+            df_scores['match_id'] = df_scores.groupby('match')['match_id'].ffill().bfill()
             df_scores['match_id'] = df_scores['match_id'].fillna('')
-
-        # for any missing values in relay and target, find the first non-null value for each user and fill all null values for that user
-        if 'user' in df_scores.columns:
-            # Replace empty strings with NaN for easier handling
-            df_scores['relay'] = df_scores['relay'].replace('', pd.NA)
-            df_scores['target'] = df_scores['target'].replace('', pd.NA)
-            
-            # Group by user and fill missing relay values with the first non-null value in each group
-            if 'relay' in df_scores.columns:
-                df_scores['relay'] = df_scores.groupby('user')['relay'].transform(
-                    lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
-                )
-            
-            # Group by user and fill missing target values with the first non-null value in each group
-            if 'target' in df_scores.columns:
-                df_scores['target'] = df_scores.groupby('user')['target'].transform(
-                    lambda x: x.fillna(x.dropna().iloc[0]) if x.dropna().size > 0 else x
-                )
-            
-            # Replace NaN back to empty string if needed
-            df_scores['relay'] = df_scores['relay'].fillna('')
-            df_scores['target'] = df_scores['target'].fillna('')
-
         
+        if 'user' in df_scores.columns:
+            for col in ['relay', 'target']:
+                if col in df_scores.columns:
+                    df_scores[col] = df_scores[col].replace('', pd.NA)
+                    # Forward-fill within each user group
+                    df_scores[col] = df_scores.groupby('user')[col].ffill().bfill()
+                    df_scores[col] = df_scores[col].fillna('')
         
         # Display updated df_scores after population
         st.subheader("Updated Scores Data (After Merging)")
         st.write(f"Updated {len(df_scores)} rows with relay, match_id, and target data")
         st.dataframe(df_scores, use_container_width=True)
-
-        
-        
-
     
-    # Store merged dataframes for display
-    merged_dataframes = []
+    # ============================================================================
+    # STEP 3: Update shooter names and merge scores data into shotmarker strings
+    # ============================================================================
+    # Create a lookup dictionary from scores DataFrame for efficient access
+    scores_lookup = {}
+    user_col = None  # Initialize outside the if block
     
-    # Update shooter names from scores CSV if available
-    # If unique_id matches, replace shooter_name with user from scores CSV + rifle from shotmarker data
-    if user_mapping:
-        for string in all_strings:
-            unique_id = string.get('unique_id', '')
-            if unique_id in user_mapping:
-                user_from_scores = user_mapping[unique_id]
-                rifle_from_shotmarker = string.get('rifle', '')
-                # Concatenate user from scores with rifle from shotmarker
-                new_shooter_name = f"{user_from_scores} {rifle_from_shotmarker}".strip()
-                
-                # Update shooter field
-                string['shooter'] = user_from_scores
-                
-                # Update shooter_name in the DataFrame if it exists
-                if 'data' in string and 'shooter_name' in string['data'].columns:
-                    string['data']['shooter_name'] = new_shooter_name
-                
-                # Create a new dataframe that outer joins the shotmarker data with the scores data
-                if 'data' in string and df_scores is not None and 'uniq_id' in df_scores.columns:
-                    df_shotmarker = string['data'].copy()
-                    # Add unique_id to the shotmarker dataframe for merging
-                    df_shotmarker['unique_id'] = unique_id
-                    
-                    # Filter scores data for this unique_id
-                    df_scores_filtered = df_scores[df_scores['uniq_id'] == unique_id].copy()
-                    
-                    if not df_scores_filtered.empty:
-                        # Merge on unique_id/uniq_id (rename one to match)
-                        df_scores_filtered = df_scores_filtered.rename(columns={'uniq_id': 'unique_id'})
-                        df_combined = pd.merge(df_shotmarker, df_scores_filtered, on='unique_id', how='outer', suffixes=('', '_scores'))
-                        string['data'] = df_combined
-                        # Store for display
-                        merged_dataframes.append({
-                            'unique_id': unique_id,
-                            'shooter': string.get('shooter', 'Unknown'),
-                            'data': df_combined
-                        })
+    if df_scores is not None and 'uniq_id' in df_scores.columns:
+        # Standardize column name for user lookup
+        for col_name in ['user', 'User', 'USER']:
+            if col_name in df_scores.columns:
+                user_col = col_name
+                break
+        
+        # Create lookup: uniq_id -> row data (as dict for easy access)
+        for _, row in df_scores.iterrows():
+            uniq_id = row['uniq_id']
+            if uniq_id:
+                scores_lookup[uniq_id] = row.to_dict()
+    
+    # Update shotmarker strings with user data and merge scores
+    for string in all_strings:
+        unique_id = string.get('unique_id', '')
+        if not unique_id or unique_id not in scores_lookup:
+            continue
+        
+        scores_row = scores_lookup[unique_id]
+        
+        # Update shooter name from scores CSV
+        user_from_scores = scores_row.get(user_col, '') if user_col else ''
+        if user_from_scores:
+            string['shooter'] = user_from_scores
+            rifle_from_shotmarker = string.get('rifle', '')
+            new_shooter_name = f"{user_from_scores} {rifle_from_shotmarker}".strip()
+            
+            # Update shooter_name in DataFrame
+            if 'data' in string and string['data'] is not None and 'shooter_name' in string['data'].columns:
+                string['data']['shooter_name'] = new_shooter_name
+        
+        # Merge scores data into shotmarker DataFrame
+        if 'data' in string and string['data'] is not None:
+            # Add unique_id to shotmarker DataFrame for reference
+            df_shotmarker = string['data'].copy()
+            df_shotmarker['unique_id'] = unique_id
+            
+            # Convert scores row to DataFrame and merge
+            df_scores_row = pd.DataFrame([scores_row])
+            # Rename uniq_id to unique_id for consistent merging
+            if 'uniq_id' in df_scores_row.columns:
+                df_scores_row = df_scores_row.rename(columns={'uniq_id': 'unique_id'})
+            
+            # Merge: use left join to keep all shotmarker rows, add scores columns
+            df_combined = pd.merge(
+                df_shotmarker, 
+                df_scores_row, 
+                on='unique_id', 
+                how='left', 
+                suffixes=('', '_scores')
+            )
+            string['data'] = df_combined
     
     # Display merged dataframes under scores section
     # if merged_dataframes and scores_uploaded_file:
