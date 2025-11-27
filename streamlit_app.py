@@ -31,7 +31,7 @@ def create_shooter_report(shooter_name, strings, get_match_number):
     fig = plt.figure(figsize=(cols * 5, rows * 5))
     fig.suptitle(f"Shooter Report: {shooter_name}", fontsize=16, weight='bold', y=0.995)
     
-    # Store individual plot images
+    # Store individual plot images as numpy arrays
     plot_images = []
     
     for string in strings:
@@ -39,12 +39,14 @@ def create_shooter_report(shooter_name, strings, get_match_number):
         result = plot_target_with_scores(string)
         plot_fig = result[0] if isinstance(result, tuple) else result
         
-        # Convert plot to image
+        # Convert plot to image and convert to numpy array before closing buffer
         plot_buf = io.BytesIO()
         plot_fig.savefig(plot_buf, format='png', dpi=100, bbox_inches='tight', pad_inches=0.2)
         plot_buf.seek(0)
         plot_img = Image.open(plot_buf)
-        plot_images.append(plot_img)
+        # Convert to numpy array so it doesn't depend on the buffer
+        plot_img_array = np.array(plot_img)
+        plot_images.append(plot_img_array)
         
         plt.close(plot_fig)  # Close the individual plot to free memory
         plot_buf.close()
