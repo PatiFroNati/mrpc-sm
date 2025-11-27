@@ -338,7 +338,7 @@ if uploaded_files:
                         match_value = f"Match: {match_val}, "
                 
                 # Display match header
-                st.subheader(f"{match_display} - {string['stage']}")
+                #st.subheader(f"{match_display} - {string['stage']}")
                 st.write(f"{match_value}Target Type: {string['course']}, Score: {string['score']}")
                 
                 df = string['data']
