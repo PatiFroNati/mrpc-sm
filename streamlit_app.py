@@ -211,6 +211,10 @@ if uploaded_files:
                 suffixes=('', '_scores')
             )
             string['data'] = df_combined
+
+            #display the df_combined datafram to inspect
+            st.subheader("Merged Data (Shotmarker + Scores)")
+            st.dataframe(df_combined, use_container_width=True)
     
     # Display merged dataframes under scores section
     # if merged_dataframes and scores_uploaded_file:
