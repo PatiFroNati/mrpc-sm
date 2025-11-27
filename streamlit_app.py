@@ -321,7 +321,7 @@ if uploaded_files:
             #     )
             #     report_buf.close()
             
-            st.divider()
+            #st.divider()
             
             # Display each match string separately within this group
             for i, string in enumerate(strings):
