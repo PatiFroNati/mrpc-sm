@@ -14,6 +14,65 @@ from shotmarker_parser import parse_shotmarker_csv
 from plot_target import plot_target_with_scores
 from score_parser import parse_scores_csv
 
+def create_shooter_report(shooter_name, strings, get_match_number):
+    """
+    Create a combined PNG report for a shooter with all their matches.
+    Returns a BytesIO buffer containing the PNG image.
+    """
+    num_strings = len(strings)
+    if num_strings == 0:
+        return None
+    
+    # Calculate grid dimensions (prefer wider layout, max 3 columns)
+    cols = min(3, num_strings)
+    rows = (num_strings + cols - 1) // cols
+    
+    # Create figure with subplots
+    fig = plt.figure(figsize=(cols * 5, rows * 5))
+    fig.suptitle(f"Shooter Report: {shooter_name}", fontsize=16, weight='bold', y=0.995)
+    
+    # Store individual plot images
+    plot_images = []
+    
+    for string in strings:
+        # Create individual plot
+        result = plot_target_with_scores(string)
+        plot_fig = result[0] if isinstance(result, tuple) else result
+        
+        # Convert plot to image
+        plot_buf = io.BytesIO()
+        plot_fig.savefig(plot_buf, format='png', dpi=100, bbox_inches='tight', pad_inches=0.2)
+        plot_buf.seek(0)
+        plot_img = Image.open(plot_buf)
+        plot_images.append(plot_img)
+        
+        plt.close(plot_fig)  # Close the individual plot to free memory
+        plot_buf.close()
+    
+    # Arrange images in grid
+    for idx, (string, plot_img) in enumerate(zip(strings, plot_images)):
+        ax = fig.add_subplot(rows, cols, idx + 1)
+        
+        # Display image in subplot
+        ax.imshow(plot_img)
+        ax.axis('off')
+        
+        # Add match info as title
+        match_num = get_match_number(string)
+        match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
+        ax.set_title(f"{match_display} - {string['stage']}\nScore: {string['score']}", 
+                    fontsize=9, pad=5)
+    
+    plt.tight_layout(rect=[0, 0, 1, 0.98])  # Leave space for main title
+    
+    # Save to buffer
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+    buf.seek(0)
+    plt.close(fig)
+    
+    return buf
+
 # Must be the first Streamlit call in the file (move this right after `import streamlit as st`)
 st.set_page_config(page_title="MRPC Shotmarker Data Explorer", layout="wide")
 
@@ -128,81 +187,102 @@ if uploaded_files:
     
     # Display grouped by shooter
     for shooter in sorted_shooters:
-        st.header(f"Shooter: {shooter}")
         strings = strings_by_shooter[shooter]
         
-        for i, string in enumerate(strings):
-            # Get match number for display
-            match_num = get_match_number(string)
-            match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
-            st.subheader(f"{match_display} - {string['stage']}")
-            st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}, Unique ID: {string['unique_id']}")
+        # Create container for each shooter
+        with st.container():
+            st.header(f"Shooter: {shooter}")
             
-            df = string['data']
-            summary_data = {
-                "Shot Number": df['id'].values,
-                "Score": df['score'].values,
-                "Time": df['time'].values
-            }
-            summary_df = pd.DataFrame(summary_data)
-            # transpose so rows become Shot Number, Score, Time and columns are each shot
-            summary_df_t = summary_df.T
-            # add a Total column (sums for each row)
-            # convert scores for summing (treat 'x' or 'X' as 10) and prepare display values
-            def _to_int_score(s):
-                if pd.isna(s):
-                    return 0
-                if isinstance(s, str) and s.strip().lower() == 'x':
-                    return 10
-                try:
-                    return int(float(s))
-                except Exception:
-                    return 0
-
-            numeric_scores = df['score'].apply(_to_int_score)
-
-            def _display_score(s):
-                if pd.isna(s):
-                    return ''
-                if isinstance(s, str) and s.strip().lower() == 'x':
-                    return 'X'
-                try:
-                    return str(int(float(s)))
-                except Exception:
-                    return str(s)
-
-            # update Score row to display 'X' for x values
-            if 'Score' in summary_df_t.index:
-                summary_df_t.loc['Score'] = [_display_score(v) for v in df['score'].values]
-
-            # add a Total column (sum of integer-converted scores, with blanks for non-score rows)
-            # summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
-            # st.dataframe(summary_df_t, use_container_width=True)
-            # show plot and scores side-by-side
-            left_col, right_col = st.columns([1, 4])
-            result = plot_target_with_scores(string)
-            fig = result[0] if isinstance(result, tuple) else result
-            with left_col:
-                st.pyplot(fig)
-            with right_col:
-                # display summary dataframe without a header and with row labels
-                st.dataframe(summary_df_t, width='content', hide_index=False)
-
-                # Show raw data toggle
-                if st.checkbox(f"Show Raw Data for {match_display}", key=f"raw_data_{shooter}_{i}"):
-                    st.subheader(f"Raw Data for {match_display}")
-                    st.write(df)
+            # Create shooter report and download button
+            report_buf = create_shooter_report(shooter, strings, get_match_number)
+            if report_buf:
+                st.download_button(
+                    label=f"📥 Download {shooter} Report (PNG)",
+                    data=report_buf,
+                    file_name=f"shooter_report_{shooter.replace(' ', '_')}.png",
+                    mime="image/png",
+                    key=f"download_report_{shooter}"
+                )
+                report_buf.close()
             
-            # do not close the figure here because it's used below for the download button
-            # Optionally, provide download link for the plot
-            buf = io.BytesIO()
-            fig.savefig(buf, format='png')
-            buf.seek(0)
-            st.download_button(
-                label="Download Target Plot as PNG",
-                data=buf,
-                file_name=f"target_plot_{shooter}_match_{match_num}_string_{i+1}.png",
-                mime="image/png"
-            )
-            buf.close()
+            st.divider()
+            
+            # Display all strings for this shooter inside the container
+            for i, string in enumerate(strings):
+                # Get match number for display
+                match_num = get_match_number(string)
+                match_display = f"Match {match_num}" if match_num != 999 else "Match Unknown"
+                st.subheader(f"{match_display} - {string['stage']}")
+                st.write(f"Date: {string['date']}, Rifle: {string['rifle']}, Course: {string['course']}, Score: {string['score']}, Unique ID: {string['unique_id']}")
+                
+                df = string['data']
+                summary_data = {
+                    "Shot Number": df['id'].values,
+                    "Score": df['score'].values,
+                    "Time": df['time'].values
+                }
+                summary_df = pd.DataFrame(summary_data)
+                # transpose so rows become Shot Number, Score, Time and columns are each shot
+                summary_df_t = summary_df.T
+                # add a Total column (sums for each row)
+                # convert scores for summing (treat 'x' or 'X' as 10) and prepare display values
+                def _to_int_score(s):
+                    if pd.isna(s):
+                        return 0
+                    if isinstance(s, str) and s.strip().lower() == 'x':
+                        return 10
+                    try:
+                        return int(float(s))
+                    except Exception:
+                        return 0
+
+                numeric_scores = df['score'].apply(_to_int_score)
+
+                def _display_score(s):
+                    if pd.isna(s):
+                        return ''
+                    if isinstance(s, str) and s.strip().lower() == 'x':
+                        return 'X'
+                    try:
+                        return str(int(float(s)))
+                    except Exception:
+                        return str(s)
+
+                # update Score row to display 'X' for x values
+                if 'Score' in summary_df_t.index:
+                    summary_df_t.loc['Score'] = [_display_score(v) for v in df['score'].values]
+
+                # add a Total column (sum of integer-converted scores, with blanks for non-score rows)
+                # summary_df_t['Total'] = ['', int(numeric_scores.sum()), '']
+                # st.dataframe(summary_df_t, use_container_width=True)
+                # show plot and scores side-by-side
+                left_col, right_col = st.columns([1, 4])
+                result = plot_target_with_scores(string)
+                fig = result[0] if isinstance(result, tuple) else result
+                with left_col:
+                    st.pyplot(fig)
+                with right_col:
+                    # display summary dataframe without a header and with row labels
+                    st.dataframe(summary_df_t, width='content', hide_index=False)
+
+                    # Show raw data toggle
+                    if st.checkbox(f"Show Raw Data for {match_display}", key=f"raw_data_{shooter}_{i}"):
+                        st.subheader(f"Raw Data for {match_display}")
+                        st.write(df)
+                
+                # do not close the figure here because it's used below for the download button
+                # Optionally, provide download link for the plot
+                buf = io.BytesIO()
+                fig.savefig(buf, format='png')
+                buf.seek(0)
+                st.download_button(
+                    label="Download Target Plot as PNG",
+                    data=buf,
+                    file_name=f"target_plot_{shooter}_match_{match_num}_string_{i+1}.png",
+                    mime="image/png"
+                )
+                buf.close()
+            
+            # Add spacing between shooter containers
+            st.markdown("<br>", unsafe_allow_html=True)
             
